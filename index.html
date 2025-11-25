@@ -1,603 +1,652 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pet</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Bar Driftwood - 深巷浮木</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-
         :root {
-            --bg-color: #f8e8f8;
-            --frame-color: #e1bee7;
-            --screen-bg: #fff0f5;
-            --text-color: #8e24aa;
-            --accent-color: #d1c4e9;
-            --bar-good: #81c784;
-            --bar-mid: #ffd54f;
-            --bar-low: #e57373;
-            --glitch-color: #ff0000;
+            --glass-bg: rgba(18, 18, 18, 0.92);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-color: #d4af37; /* 香槟金 */
+            --paper-color: #f0f0e0; /* 账单纸张色 */
+            --card-bg: #1a1a1a; /* 输入卡片背景 */
+            --text-main: #e0e0e0;
+            --text-dim: #888;
         }
 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
         body {
+            background-color: #050505;
+            background-image: url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=1920&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: var(--text-main);
+            font-family: "Georgia", "Songti SC", "SimSun", serif; /* 增加中文字体 */
             margin: 0;
-            height: 100vh;
+            height: 100dvh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: var(--bg-color);
-            font-family: 'Press Start 2P', cursive;
+            flex-direction: column;
             overflow: hidden;
-            transition: background-color 2s ease;
             user-select: none;
         }
 
-        /* 游戏机外壳 */
-        .game-console {
-            width: 320px;
-            height: 500px;
-            background-color: var(--frame-color);
-            border-radius: 30px;
+        /* 动画定义 */
+        @keyframes alert-flash {
+            0% { box-shadow: inset 0 0 0 rgba(212, 175, 55, 0); }
+            50% { box-shadow: inset 0 0 80px rgba(212, 175, 55, 0.4); }
+            100% { box-shadow: inset 0 0 0 rgba(212, 175, 55, 0); }
+        }
+        .flash-active { animation: alert-flash 1.2s ease-in-out 3; }
+
+        @keyframes modal-in {
+            from { transform: translate(-50%, -40%) scale(0.95); opacity: 0; }
+            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .vignette {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.95) 90%);
+            pointer-events: none; z-index: 0;
+        }
+
+        .app-container {
+            position: relative; z-index: 1;
+            display: flex; flex-direction: column;
+            height: 100%; width: 100%; max-width: 600px;
+            margin: 0 auto;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-left: 1px solid var(--glass-border);
+            border-right: 1px solid var(--glass-border);
+        }
+
+        /* 1. 顶部 Header */
+        .header-area {
+            padding: 15px; text-align: center;
+            border-bottom: 1px solid var(--glass-border); flex-shrink: 0;
+            position: relative;
+        }
+        .realtime-clock {
+            font-size: 2.4em; color: var(--accent-color);
+            font-weight: lighter; letter-spacing: 2px;
+            font-variant-numeric: tabular-nums; line-height: 1;
+        }
+        .bartender-status {
+            font-style: italic; color: var(--text-dim); font-size: 0.85em;
+            margin-top: 8px; display: flex; justify-content: center; align-items: center; gap: 6px;
+        }
+        .mood-dot { width: 6px; height: 6px; border-radius: 50%; background: #555; transition: background 0.5s;}
+        
+        /* 账单按钮 (右上角) */
+        .bill-btn {
+            position: absolute; right: 15px; top: 50%; transform: translateY(-50%);
+            background: rgba(255,255,255,0.05); border: 1px solid #444; color: var(--accent-color);
+            width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 1.2em;
+            transition: all 0.2s;
+        }
+        .bill-btn:active { transform: translateY(-50%) scale(0.9); background: var(--accent-color); color: #000; }
+
+        /* 2. 聊天区域 */
+        .chat-area {
+            flex: 1; overflow-y: auto; padding: 15px;
+            display: flex; flex-direction: column; gap: 12px;
+            overscroll-behavior: contain;
+        }
+        .message {
+            max-width: 88%; padding: 10px 14px; line-height: 1.5; font-size: 0.95em;
+            border-radius: 8px; animation: slideIn 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+            word-wrap: break-word;
+        }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .msg-bartender { align-self: flex-start; color: #dcdcdc; border-left: 3px solid var(--accent-color); background: rgba(255, 255, 255, 0.05); margin-right: 20px; }
+        .msg-user { align-self: flex-end; background-color: rgba(212, 175, 55, 0.15); color: #ddd; text-align: right; margin-left: 20px; }
+        .msg-event { align-self: center; font-size: 0.85em; color: var(--accent-color); font-style: italic; opacity: 0.7; margin: 5px 0; text-align: center; }
+
+        /* 3. 待办事项 */
+        .mid-section { padding: 0 15px 10px; flex-shrink: 0; }
+        .panel-box {
+            background: rgba(0, 0, 0, 0.4); padding: 10px;
+            border-radius: 8px; border: 1px solid var(--glass-border);
+        }
+        .panel-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+        }
+        .panel-title { font-size: 0.85em; color: var(--text-dim); letter-spacing: 1px; }
+        
+        /* 新设计的待办输入按钮 */
+        .open-todo-btn {
+            background: rgba(255,255,255,0.1); border: 1px solid #555; color: #ccc;
+            padding: 4px 12px; border-radius: 20px; font-size: 0.85em; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .open-todo-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+        .open-todo-btn:active { transform: scale(0.95); }
+
+        .list-container { list-style: none; padding: 0; margin: 0; max-height: 80px; overflow-y: auto; }
+        .list-item { display: flex; align-items: center; padding: 6px 0; font-size: 0.9em; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .list-item.completed span { text-decoration: line-through; color: #555; }
+        .list-item input[type="checkbox"] { margin-right: 10px; accent-color: var(--accent-color); }
+        .del-btn { margin-left: auto; background: transparent; border: none; color: #666; font-size: 1.4em; padding: 0 10px; cursor: pointer; }
+
+        /* 4. 底部控制区 */
+        .controls-area {
+            padding: 15px 20px 25px; background: rgba(12, 12, 12, 0.98);
+            border-top: 1px solid var(--glass-border); flex-shrink: 0;
+        }
+        .timer-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .timer-display { font-size: 2em; color: var(--accent-color); font-variant-numeric: tabular-nums; font-weight: bold; }
+        .time-setter { display: flex; align-items: center; color: #ccc; font-size: 0.9em; }
+        .time-input { background: #2a2a2a; border: 1px solid #555; color: #fff; width: 50px; text-align: center; padding: 5px; margin: 0 8px; border-radius: 4px; font-size: 1.1em; font-weight: bold; }
+        
+        .action-row { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        button.action-btn {
+            background: rgba(255,255,255,0.06); border: 1px solid #444; color: #aaa; padding: 14px 0;
+            border-radius: 8px; font-family: inherit; font-size: 0.95em; cursor: pointer; transition: all 0.2s;
+        }
+        button.action-btn:active { transform: scale(0.98); background: rgba(255,255,255,0.1); }
+        button.action-btn.primary { border-color: var(--accent-color); color: var(--accent-color); }
+        button.action-btn.active-state { background: var(--accent-color); color: #000; border-color: var(--accent-color); font-weight: bold; }
+
+        .audio-row { display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,0.05); padding: 8px 12px; border-radius: 8px; }
+        select { background: transparent; border: none; color: #ccc; flex: 1; font-size: 0.9em; outline: none; }
+        option { background: #222; }
+        input[type="range"] { width: 80px; accent-color: var(--accent-color); }
+
+        /* === 模态框通用遮罩 === */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+            z-index: 100; display: none; opacity: 0; transition: opacity 0.3s;
+        }
+        .modal-overlay.open { display: block; opacity: 1; }
+
+        /* === 账单弹窗 (白色纸张风格) === */
+        .receipt-modal {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%; max-width: 320px;
+            background: var(--paper-color);
+            color: #333;
             padding: 20px;
-            box-shadow: 10px 10px 0px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            position: relative;
-            transition: all 1s ease;
+            font-family: "Courier New", "SimSun", monospace; /* 账单字体 */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            mask-image: linear-gradient(0deg, transparent 5px, #000 6px), linear-gradient(180deg, transparent 5px, #000 6px);
+            animation: modal-in 0.4s ease-out;
         }
-
-        /* 屏幕区域 */
-        .screen {
-            width: 280px;
-            height: 280px;
-            background-color: var(--screen-bg);
-            border: 4px solid #fff;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            position: relative;
-            overflow: hidden;
-            image-rendering: pixelated;
-            transition: all 1s ease;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        /* 状态条 */
-        .status-bar {
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            z-index: 10;
-        }
-
-        .stat-row {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .icon { font-size: 12px; width: 20px; }
-
-        .bar-container {
-            width: 100px;
-            height: 8px;
-            background: rgba(0,0,0,0.1);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .bar-fill {
-            height: 100%;
-            width: 100%;
-            background-color: var(--bar-good);
-            transition: width 0.3s, background-color 0.3s;
-        }
-
-        /* 宠物区域 */
-        .pet-container {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        .pet {
-            width: 100px;
-            height: 100px;
-            transition: transform 0.2s;
-            position: relative;
-        }
-
-        /* 像素画绘制 (SVG) */
-        .pixel-svg {
-            width: 100%;
-            height: 100%;
-        }
+        .receipt-header { text-align: center; border-bottom: 2px dashed #999; padding-bottom: 10px; margin-bottom: 10px; }
+        .receipt-header h3 { margin: 0; font-size: 1.4em; text-transform: uppercase; letter-spacing: 2px; }
+        .receipt-header p { margin: 5px 0 0; font-size: 0.9em; color: #666; }
         
-        /* 初始可爱形态 */
-        .pet-body { fill: #ff80ab; transition: fill 1s; }
-        .pet-eye { fill: #4a148c; }
-        .pet-mouth { fill: #4a148c; }
-        .pet-blush { fill: #ff4081; opacity: 0.6; }
+        /* 账单列表 - 可翻页/滚动 */
+        .receipt-list { 
+            list-style: none; padding: 0; margin: 0; 
+            max-height: 250px; /* 固定高度实现滚动翻页感 */
+            overflow-y: auto; 
+            font-size: 0.9em; 
+            border-bottom: 2px dashed #999; /* 底部虚线 */
+        }
+        /* 滚动条样式优化 */
+        .receipt-list::-webkit-scrollbar { width: 4px; }
+        .receipt-list::-webkit-scrollbar-thumb { background: #bbb; border-radius: 2px; }
         
-        /* 伪装外星形态细节 (隐藏) */
-        .alien-vein { fill: none; stroke: #8b0000; stroke-width: 2; opacity: 0; transition: opacity 1s; }
-        .alien-eye-inner { fill: #ff0000; opacity: 0; }
-
-        /* 按钮区域 */
-        .controls {
-            display: flex;
-            gap: 15px;
-            width: 100%;
-            justify-content: center;
-        }
-
-        .btn {
-            width: 60px;
-            height: 60px;
-            border: none;
-            border-radius: 50%;
-            background-color: #fff;
-            box-shadow: 0 4px 0 #ccc;
-            cursor: pointer;
-            font-size: 20px;
-            color: var(--text-color);
-            transition: transform 0.1s, box-shadow 0.1s;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .btn:active {
-            transform: translateY(4px);
-            box-shadow: 0 0 0 #ccc;
-        }
-
-        /* 动画类 */
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        .anim-bounce { animation: bounce 2s infinite; }
-
-        @keyframes shake {
-            0% { transform: translate(1px, 1px) rotate(0deg); }
-            10% { transform: translate(-1px, -2px) rotate(-1deg); }
-            20% { transform: translate(-3px, 0px) rotate(1deg); }
-            30% { transform: translate(3px, 2px) rotate(0deg); }
-            40% { transform: translate(1px, -1px) rotate(1deg); }
-            50% { transform: translate(-1px, 2px) rotate(-1deg); }
-            60% { transform: translate(-3px, 1px) rotate(0deg); }
-            70% { transform: translate(3px, 1px) rotate(-1deg); }
-            80% { transform: translate(-1px, -1px) rotate(1deg); }
-            90% { transform: translate(1px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
-        }
-
-        @keyframes glitch-anim {
-            0% { clip-path: inset(40% 0 61% 0); }
-            20% { clip-path: inset(92% 0 1% 0); }
-            40% { clip-path: inset(43% 0 1% 0); }
-            60% { clip-path: inset(25% 0 58% 0); }
-            80% { clip-path: inset(54% 0 7% 0); }
-            100% { clip-path: inset(58% 0 43% 0); }
-        }
-
-        /* 崩坏阶段样式 */
-        body.phase-1 {
-            --bg-color: #2e2e2e;
-            --frame-color: #4a4a4a;
-            --screen-bg: #333;
-            --text-color: #fff;
-            --bar-good: #66bb6a;
-        }
+        .receipt-list li { display: flex; justify-content: space-between; margin-bottom: 8px; padding-right: 5px; }
         
-        body.phase-2 {
-            --bg-color: #1a0000;
-            --frame-color: #2b0000;
-            --screen-bg: #110000;
-            --text-color: #ff0000;
-            --bar-good: #8b0000;
-            --bar-mid: #500000;
-            --bar-low: #ff0000;
+        .receipt-footer { padding-top: 15px; text-align: center; }
+        .receipt-btn {
+            background: #333; color: var(--paper-color); border: none; padding: 8px 25px;
+            font-family: inherit; font-weight: bold; cursor: pointer; text-transform: uppercase;
         }
 
-        body.phase-2 .pet {
-            animation: shake 2s infinite;
-        }
-        
-        body.phase-2 .screen::before {
-            content: " ";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 0, 0, 0.1);
-            pointer-events: none;
-            z-index: 5;
-            animation: flicker 0.1s infinite;
-        }
-
-        @keyframes flicker {
-            0% { opacity: 0.1; }
-            50% { opacity: 0.2; }
-            100% { opacity: 0.1; }
-        }
-
-        /* 结局覆盖层 */
-        #overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            color: white;
+        /* === 待办输入弹窗 (深色卡片风格) === */
+        .input-modal {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%; max-width: 300px;
+            background: var(--card-bg);
+            border: 1px solid #444;
+            color: #fff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            animation: modal-in 0.3s ease-out;
             text-align: center;
-            display: none;
         }
-
-        #start-screen {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #f8e8f8;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 200;
-            cursor: pointer;
-            flex-direction: column;
+        .input-modal h3 { margin: 0 0 15px 0; color: var(--accent-color); font-weight: normal; letter-spacing: 1px; }
+        .input-field {
+            width: 100%; background: #252525; border: 1px solid #555;
+            color: #fff; padding: 10px; border-radius: 6px;
+            font-size: 1em; margin-bottom: 20px; outline: none;
         }
-        
-        .blink { animation: opacityPulse 1s infinite; }
-        @keyframes opacityPulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+        .input-field:focus { border-color: var(--accent-color); }
+        .modal-actions { display: flex; gap: 10px; justify-content: center; }
+        .modal-btn {
+            flex: 1; padding: 10px 0; border: none; border-radius: 6px;
+            cursor: pointer; font-size: 0.9em; transition: background 0.2s;
+        }
+        .modal-btn.confirm { background: var(--accent-color); color: #000; font-weight: bold; }
+        .modal-btn.cancel { background: #333; color: #ccc; }
 
     </style>
 </head>
 <body>
 
-    <!-- 开始界面 (为了音频上下文) -->
-    <div id="start-screen">
-        <div style="font-size: 40px; color: #8e24aa; margin-bottom: 20px;">♥ P E T ♥</div>
-        <div class="blink" style="font-size: 12px; color: #8e24aa;">CLICK TO START</div>
-    </div>
+    <div class="vignette"></div>
 
-    <!-- 结局/消息覆盖层 -->
-    <div id="overlay">
-        <h1 id="end-title">TITLE</h1>
-        <p id="end-desc" style="font-size: 10px; max-width: 80%; line-height: 1.5;"></p>
-    </div>
-
-    <div class="game-console">
-        <div class="screen">
-            <div class="status-bar">
-                <div class="stat-row">
-                    <span class="icon">🍖</span>
-                    <div class="bar-container"><div class="bar-fill" id="bar-hunger"></div></div>
-                </div>
-                <div class="stat-row">
-                    <span class="icon">🎵</span>
-                    <div class="bar-container"><div class="bar-fill" id="bar-mood"></div></div>
-                </div>
-                <div class="stat-row">
-                    <span class="icon">⚡</span>
-                    <div class="bar-container"><div class="bar-fill" id="bar-energy"></div></div>
-                </div>
+    <div class="app-container" id="main-container">
+        <!-- 1. Header -->
+        <div class="header-area">
+            <div class="realtime-clock" id="clock">00:00</div>
+            <div class="bartender-status">
+                <span class="mood-dot" id="mood-indicator"></span>
+                <span id="status-text">Cipher 正在擦拭高脚杯...</span>
             </div>
+            <!-- 账单/记录按钮 -->
+            <button class="bill-btn" onclick="openHistory()" title="时光账单">📜</button>
+        </div>
 
-            <div class="pet-container">
-                <div class="pet anim-bounce" id="pet">
-                    <svg viewBox="0 0 100 100" class="pixel-svg">
-                        <!-- 触手/身体底层 -->
-                         <path class="alien-vein" d="M20,80 Q10,90 20,100 M80,80 Q90,90 80,100 M10,50 Q0,60 10,70" />
-                        <!-- 可爱身体 -->
-                        <path class="pet-body" d="M20,80 Q10,50 20,30 Q30,10 50,10 Q70,10 80,30 Q90,50 80,80 Q50,90 20,80 Z" />
-                        <!-- 眼睛 -->
-                        <circle class="pet-eye" cx="35" cy="45" r="5" />
-                        <circle class="pet-eye" cx="65" cy="45" r="5" />
-                        <circle class="alien-eye-inner" cx="35" cy="45" r="2" />
-                        <circle class="alien-eye-inner" cx="65" cy="45" r="2" />
-                        <!-- 腮红 -->
-                        <circle class="pet-blush" cx="25" cy="55" r="4" />
-                        <circle class="pet-blush" cx="75" cy="55" r="4" />
-                        <!-- 嘴巴 -->
-                        <path class="pet-mouth" d="M45,55 Q50,60 55,55" fill="none" stroke="#4a148c" stroke-width="2" stroke-linecap="round" />
-                    </svg>
+        <!-- 2. Chat Stream -->
+        <div class="chat-area" id="chat-box"></div>
+
+        <!-- 3. Mid Section (Todo) -->
+        <div class="mid-section">
+            <div class="panel-box">
+                <div class="panel-header">
+                    <span class="panel-title">待办事项</span>
+                    <button class="open-todo-btn" onclick="openTodoModal()">✎ 记一笔</button>
                 </div>
-                <!-- 装饰性对话框 -->
-                <div id="dialog" style="position: absolute; top: 10px; right: 10px; font-size: 10px; color: var(--text-color); opacity: 0; transition: opacity 0.5s;">♥</div>
+                <ul class="list-container" id="todo-list">
+                    <!-- 任务列表将在这里生成 -->
+                </ul>
             </div>
         </div>
 
-        <div class="controls">
-            <button class="btn" onclick="interact('feed')">🍖</button>
-            <button class="btn" onclick="interact('play')">🥎</button>
-            <button class="btn" onclick="interact('sleep')">💤</button>
+        <!-- 4. Controls -->
+        <div class="controls-area">
+            <div class="timer-row">
+                <div class="timer-display" id="timer-display">25:00</div>
+                <div class="time-setter" id="time-setter-box">
+                    专注 <input type="number" class="time-input" id="custom-minutes" value="25" min="1" max="180"> 分钟
+                </div>
+            </div>
+
+            <div class="action-row">
+                <button class="action-btn primary" id="focus-btn" onclick="toggleFocus()">开始专注</button>
+                <button class="action-btn" onclick="orderDrink()">特调</button>
+                <button class="action-btn" onclick="chatWithBartender()">闲聊</button>
+            </div>
+
+            <div class="audio-row">
+                <select id="noise-selector" onchange="changeNoise()">
+                    <option value="rain">🌧️ 深夜雨声</option>
+                    <option value="cafe">☕ 深巷咖啡</option>
+                </select>
+                <input type="range" id="volume" min="0" max="1" step="0.1" value="0.4" oninput="adjustVolume()">
+            </div>
         </div>
     </div>
+
+    <!-- 弹窗1：时光账单 (历史记录) -->
+    <div id="modal-bill" class="modal-overlay">
+        <div class="receipt-modal">
+            <div class="receipt-header">
+                <h3>时光账单</h3>
+                <p>Bar Driftwood</p>
+                <p id="total-sessions" style="font-size: 0.8em; margin-top:5px;">累计专注: 0 次</p>
+            </div>
+            <!-- 可滚动的列表 -->
+            <ul id="history-list" class="receipt-list">
+                <!-- 记录项 -->
+            </ul>
+            <div class="receipt-footer">
+                <button class="receipt-btn" onclick="closeHistory()">收起</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗2：待办输入 (新弹窗) -->
+    <div id="modal-todo" class="modal-overlay">
+        <div class="input-modal">
+            <h3>新增待办</h3>
+            <input type="text" class="input-field" id="todo-input-field" placeholder="写点什么..." autocomplete="off">
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeTodoModal()">取消</button>
+                <button class="modal-btn confirm" onclick="confirmTodo()">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <audio id="bgm" preload="auto"></audio>
 
     <script>
-        // 游戏状态
-        let stats = {
-            hunger: 50,
-            mood: 50,
-            energy: 50,
-            corruption: 0 // 隐藏数值：外星同化度
+        // --- 核心 UI 引用 ---
+        const ui = {
+            container: document.getElementById('main-container'),
+            clock: document.getElementById('clock'),
+            statusText: document.getElementById('status-text'),
+            moodDot: document.getElementById('mood-indicator'),
+            chatBox: document.getElementById('chat-box'),
+            timerDisplay: document.getElementById('timer-display'),
+            focusBtn: document.getElementById('focus-btn'),
+            customInput: document.getElementById('custom-minutes'),
+            timeSetterBox: document.getElementById('time-setter-box'),
+            bgm: document.getElementById('bgm'),
+            noiseSelector: document.getElementById('noise-selector'),
+            volumeSlider: document.getElementById('volume'),
+            // 账单弹窗
+            modalBill: document.getElementById('modal-bill'),
+            historyList: document.getElementById('history-list'),
+            totalSessions: document.getElementById('total-sessions'),
+            // 待办弹窗
+            modalTodo: document.getElementById('modal-todo'),
+            todoInput: document.getElementById('todo-input-field'),
+            todoList: document.getElementById('todo-list')
         };
 
-        let gameActive = false;
-        let loopId;
-        let audioCtx;
-        let bgmOscillators = [];
+        const sounds = {
+            rain: "https://actions.google.com/sounds/v1/weather/rain_heavy_loud.ogg",
+            cafe: "https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg"
+        };
 
-        // 元素引用
-        const body = document.body;
-        const pet = document.getElementById('pet');
-        const barHunger = document.getElementById('bar-hunger');
-        const barMood = document.getElementById('bar-mood');
-        const barEnergy = document.getElementById('bar-energy');
-        const dialog = document.getElementById('dialog');
-        const overlay = document.getElementById('overlay');
-        const startScreen = document.getElementById('start-screen');
+        let state = {
+            isFocusing: false,
+            timeLeft: 0,
+            initialTime: 0,
+            timerId: null,
+            audioContext: null,
+            mood: 'calm', 
+            completedCount: 0
+        };
 
-        // 启动游戏
-        startScreen.addEventListener('click', () => {
-            startScreen.style.display = 'none';
-            initAudio();
-            gameActive = true;
-            startGameLoop();
-            playMusic('happy');
+        // --- 1. 对话匹配引擎 (中文) ---
+        const chatTopics = [
+            { id: 'tired', user: ["我觉得有点累。", "今天过得好漫长。", "能量耗尽了。"] },
+            { id: 'story', user: ["讲讲你的故事吧。", "这里一直都这么安静吗？", "你有在等的人吗？"] },
+            { id: 'advice', user: ["给我一点建议吧。", "我有点迷茫。", "接下来该做什么？"] },
+            { id: 'weather', user: ["这雨什么时候会停？", "外面好冷。", "这种天气真让人想睡觉。"] }
+        ];
+
+        const bartenderResponses = {
+            // 平静状态
+            calm: {
+                tired: ["累了就歇会儿。在这里，时间是静止的。", "闭上眼，听听冰块融化的声音，不用急着赶路。"],
+                story: ["我的故事没什么特别的，只是在这吧台后面看了很久的人来人往。", "这里是时间的避难所。只要你愿意，它就存在。"],
+                advice: ["如果不知道方向，就先停下来。有时候，答案在静默中。", "做你现在能做的，剩下的交给时间。"],
+                weather: ["不用管外面的风雨。在这里，只有温暖的灯光。", "雨声是最好的白噪音，不是吗？"]
+            },
+            // 忧郁状态
+            melancholic: {
+                tired: ["疲惫是活着的证明，但也没必要一直逞强。", "把重担放下吧，哪怕只有几分钟，没人会怪你。"],
+                story: ["故事往往都是关于遗憾的。我在这里，也许只是为了守住某些回忆。", "我们都是被困在琥珀里的虫子，挣扎也只是姿态。"],
+                advice: ["我也在寻找答案。或许，接受迷茫本身就是一种解脱。", "在这个混乱的世界里，能专注做好一件事就很奢侈了。"],
+                weather: ["这场雨让我想起了一个很久没见的人。", "阴天的时候，回忆总是特别清晰。"]
+            },
+            // 愉快状态
+            cheerful: {
+                tired: ["喝杯水休息一下，我相信你马上就能满血复活。", "辛苦了！这杯水我请客，为了你的努力。"],
+                story: ["我看过很多人在这里哭，但最后他们都笑着走出去了。", "这里唯一的秘密，就是这里的客人都很特别——比如你。"],
+                advice: ["别想太多，有时候直觉是最准的。", "我看好你。你的下一个计划一定会顺利的。"],
+                weather: ["不管外面怎么样，心里的天要是晴的就行。", "你不觉得这种天气很有情调吗？"]
+            }
+        };
+
+        const idleActions = {
+            calm: ["正在仔细擦拭一只水晶杯...", "正在阅读一张泛黄的旧报纸...", "整理着吧台后的酒瓶..."],
+            melancholic: ["望着窗外的雨丝出神...", "抚摸着一枚旧银戒...", "看着空酒杯发呆..."],
+            cheerful: ["哼着不知名的爵士小调...", "微笑着向您致意...", "正在尝试新的调酒配方..."]
+        };
+
+        const drinks = [
+            {n: "莫比乌斯环", d: "苦涩是开始，回甘是结束。"},
+            {n: "雨后空城", d: "金酒与迷迭香。清醒而冷冽。"},
+            {n: "第25小时", d: "为了那些偷来的时间。"},
+            {n: "日出印象", d: "橙汁与石榴糖浆。像希望一样甜美。"}
+        ];
+
+        // --- 2. 初始化逻辑 ---
+        window.onload = () => {
+            setInterval(() => {
+                const now = new Date();
+                ui.clock.innerText = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false });
+            }, 1000);
+
+            ui.bgm.src = sounds.rain; ui.bgm.volume = 0.4;
+            ui.bgm.addEventListener('ended', function() { this.currentTime = 0; this.play(); }, false);
+
+            getWeatherAndGreet();
+            startBartenderAI();
+        };
+
+        function getWeatherAndGreet() {
+            if ("geolocation" in navigator) {
+                addMessage("（Cipher 望向窗外）正在确认外面的天气...", "event");
+                navigator.geolocation.getCurrentPosition(async (pos) => {
+                    try {
+                        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&current_weather=true`);
+                        const data = await res.json();
+                        handleWeather(data.current_weather);
+                    } catch (e) { addMessage("欢迎。这里永远为你敞开。", "bartender"); }
+                }, () => addMessage("欢迎光临深巷浮木。", "bartender"));
+            } else { addMessage("欢迎光临。", "bartender"); }
+        }
+
+        function handleWeather(w) {
+            const code = w.weathercode;
+            if (code <= 3) { state.mood = 'calm'; addMessage("外面是个晴朗的夜晚，适合独处。", "bartender"); }
+            else if (code >= 51) { state.mood = 'melancholic'; addMessage("下雨了，进来躲躲吧。", "bartender"); }
+            else { state.mood = 'cheerful'; addMessage("今晚的风很舒服。", "bartender"); }
+            updateStatusUI();
+        }
+
+        function startBartenderAI() {
+            setInterval(() => {
+                if (state.isFocusing) return;
+                const r = Math.random();
+                if (r < 0.5) state.mood = 'calm';
+                else if (r < 0.8) state.mood = 'melancholic';
+                else state.mood = 'cheerful';
+                updateStatusUI();
+                
+                if (Math.random() < 0.25) {
+                    const events = ["Cipher 往杯中加了一块老冰。", "Cipher 换了一张黑胶唱片。", "风铃轻响，似有故人来。"];
+                    addMessage(events[Math.floor(Math.random()*events.length)], "event");
+                }
+            }, 25000);
+        }
+
+        function updateStatusUI() {
+            const actions = idleActions[state.mood];
+            const action = actions[Math.floor(Math.random() * actions.length)];
+            ui.statusText.innerText = `Cipher ${action}`;
+            
+            const colors = { calm: '#d4af37', melancholic: '#a8a8ff', cheerful: '#ffb366' };
+            ui.moodDot.style.backgroundColor = colors[state.mood];
+        }
+
+        // --- 3. 交互功能 ---
+        function chatWithBartender() {
+            if (state.isFocusing) return addMessage("嘘... 钟摆还在走。", "bartender");
+            
+            const topicObj = chatTopics[Math.floor(Math.random() * chatTopics.length)];
+            const topicID = topicObj.id;
+            const userText = topicObj.user[Math.floor(Math.random() * topicObj.user.length)];
+            addMessage(userText, "user");
+            
+            setTimeout(() => {
+                const responseList = bartenderResponses[state.mood][topicID] || bartenderResponses['calm'][topicID];
+                const reply = responseList[Math.floor(Math.random() * responseList.length)];
+                addMessage(reply, "bartender");
+            }, 1000);
+        }
+
+        function orderDrink() {
+            if (state.isFocusing) return addMessage("（将你手中饮品拿走）嗯？现在还在专注时间，替您保管了。", "bartender");
+            addMessage("请给我一杯特调。", "user");
+            ui.statusText.innerText = "Cipher 转身调酒...";
+            setTimeout(() => {
+                const d = drinks[Math.floor(Math.random() * drinks.length)];
+                addMessage(`为您准备了「${d.n}」。<br>${d.d}`, "bartender");
+                ui.statusText.innerText = "Cipher 期待地看着您...";
+            }, 1200);
+        }
+
+        // --- 4. 番茄钟 ---
+        function toggleFocus() { state.isFocusing ? stopFocus() : startFocus(); }
+
+        function startFocus() {
+            let mins = parseInt(ui.customInput.value);
+            if (isNaN(mins) || mins <= 0) { mins = 25; ui.customInput.value = 25; }
+            state.timeLeft = mins * 60;
+            state.initialTime = mins * 60;
+            state.isFocusing = true;
+            ui.focusBtn.innerText = "停止专注";
+            ui.focusBtn.classList.add('active-state');
+            ui.timeSetterBox.style.display = 'none';
+            ui.statusText.innerText = "Cipher 将沙漏倒置...";
+            initAudioContext();
+            ui.bgm.play().catch(e => console.log("Audio waiting"));
+            addMessage(`明白了，${mins}分钟。我会守着时间。`, "bartender");
+            
+            state.timerId = setInterval(() => {
+                state.timeLeft--;
+                updateTimerDisplay();
+                if (state.timeLeft === 600 && state.initialTime > 600) triggerAlert("路程过半。");
+                if (state.timeLeft === 300 && state.initialTime > 300) {
+                    triggerAlert("最后5分钟。");
+                    ui.statusText.innerText = "Cipher 轻轻敲杯沿...";
+                }
+                if (state.timeLeft <= 0) finishFocus();
+            }, 1000);
+        }
+
+        function stopFocus() {
+            clearInterval(state.timerId); state.isFocusing = false;
+            resetUI(); addMessage("休息一下也好。", "bartender"); ui.bgm.pause();
+        }
+
+        function finishFocus() {
+            clearInterval(state.timerId); state.isFocusing = false;
+            resetUI();
+            triggerAlert("时间到了。辛苦了。", true);
+            ui.statusText.innerText = "Cipher 递给您温水...";
+            saveSessionToLog(state.initialTime / 60);
+            ui.bgm.pause();
+        }
+
+        function resetUI() {
+            ui.focusBtn.innerText = "开始专注"; ui.focusBtn.classList.remove('active-state');
+            ui.timeSetterBox.style.display = 'flex';
+        }
+
+        // --- 5. 账单与待办逻辑 ---
+        
+        // 记录专注时间到账单
+        function saveSessionToLog(duration) {
+            state.completedCount++;
+            ui.totalSessions.innerText = `累计专注: ${state.completedCount} 次`;
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'});
+            
+            const li = document.createElement('li');
+            // 中文格式
+            li.innerHTML = `<span>${timeStr} 专注时刻</span> <span>${duration}分钟</span>`;
+            ui.historyList.insertBefore(li, ui.historyList.firstChild); // 最新在最前
+        }
+
+        // 账单弹窗控制
+        function openHistory() { ui.modalBill.classList.add('open'); }
+        function closeHistory() { ui.modalBill.classList.remove('open'); }
+
+        // 待办弹窗控制
+        function openTodoModal() { 
+            ui.modalTodo.classList.add('open'); 
+            setTimeout(() => ui.todoInput.focus(), 100);
+        }
+        function closeTodoModal() { 
+            ui.modalTodo.classList.remove('open'); 
+            ui.todoInput.value = '';
+        }
+
+        // 确认添加待办
+        function confirmTodo() {
+            const val = ui.todoInput.value.trim();
+            if(!val) {
+                closeTodoModal();
+                return;
+            }
+            
+            const li = document.createElement('li');
+            li.className = 'list-item';
+            li.innerHTML = `
+                <input type="checkbox" onclick="this.parentElement.classList.toggle('completed')">
+                <span>${val}</span>
+                <button class="del-btn" onclick="this.parentElement.remove()">×</button>
+            `;
+            ui.todoList.appendChild(li);
+            closeTodoModal();
+            addMessage(`"${val}" 已记下。`, "event");
+        }
+
+        // 支持回车添加
+        ui.todoInput.addEventListener('keypress', (e)=>{
+            if(e.key==='Enter') confirmTodo();
         });
 
-        // 核心循环
-        function startGameLoop() {
-            loopId = setInterval(() => {
-                if (!gameActive) return;
+        // 点击遮罩关闭对应的弹窗
+        ui.modalBill.addEventListener('click', (e) => {
+            if (e.target === ui.modalBill) closeHistory();
+        });
+        ui.modalTodo.addEventListener('click', (e) => {
+            if (e.target === ui.modalTodo) closeTodoModal();
+        });
 
-                // 自然衰减
-                stats.hunger -= 0.5;
-                stats.mood -= 0.5;
-                stats.energy -= 0.2;
-
-                // 腐蚀度自然增长 (随着时间推移，怪物伪装逐渐失效)
-                stats.corruption += 0.1; 
-
-                // 状态边界检查
-                checkBounds();
-                updateVisuals();
-                checkEndings();
-
-            }, 500);
+        // --- 辅助功能 ---
+        function updateTimerDisplay() {
+            const m = Math.floor(state.timeLeft / 60);
+            const s = state.timeLeft % 60;
+            ui.timerDisplay.innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         }
-
-        function interact(type) {
-            if (!gameActive) return;
-            
-            playSFX(type);
-
-            // 每次互动都会加速同化（腐蚀）
-            stats.corruption += 1.5;
-
-            switch(type) {
-                case 'feed':
-                    stats.hunger += 15;
-                    stats.energy += 2;
-                    showDialog(["Yummy!", "More...", "CONSUME"][getPhase()]);
-                    petAnim('scale(1.1)', 200);
-                    break;
-                case 'play':
-                    stats.mood += 15;
-                    stats.hunger -= 5;
-                    showDialog(["Fun!", "Obey.", "SUBMIT"][getPhase()]);
-                    petAnim('rotate(10deg)', 200);
-                    break;
-                case 'sleep':
-                    stats.energy += 20;
-                    stats.hunger -= 10;
-                    showDialog(["Zzz...", "Wait...", "DORMANCY"][getPhase()]);
-                    document.querySelector('.screen').style.filter = 'brightness(0.5)';
-                    setTimeout(() => document.querySelector('.screen').style.filter = '', 500);
-                    break;
-            }
-            
-            checkBounds();
-            updateVisuals();
+        function initAudioContext() {
+            if (!state.audioContext) state.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            if (state.audioContext.state === 'suspended') state.audioContext.resume();
         }
-
-        function checkBounds() {
-            stats.hunger = Math.min(100, Math.max(0, stats.hunger));
-            stats.mood = Math.min(100, Math.max(0, stats.mood));
-            stats.energy = Math.min(100, Math.max(0, stats.energy));
-            stats.corruption = Math.min(100, Math.max(0, stats.corruption));
+        function playBeep(freq) {
+            if (!state.audioContext) initAudioContext();
+            const ctx = state.audioContext;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine'; osc.frequency.setValueAtTime(freq, ctx.currentTime);
+            gain.gain.setValueAtTime(0.1, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1);
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.start(); osc.stop(ctx.currentTime + 1);
         }
-
-        function getPhase() {
-            if (stats.corruption < 40) return 0; // 萌系
-            if (stats.corruption < 80) return 1; // 崩坏
-            return 2; // 恐怖
+        function triggerAlert(text, isFinish) {
+            isFinish ? (playBeep(523), setTimeout(()=>playBeep(659),300)) : playBeep(880);
+            ui.container.classList.add('flash-active');
+            setTimeout(() => ui.container.classList.remove('flash-active'), 3000);
+            if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+            addMessage(text, "bartender");
         }
-
-        function updateVisuals() {
-            // 更新进度条
-            updateBar(barHunger, stats.hunger);
-            updateBar(barMood, stats.mood);
-            updateBar(barEnergy, stats.energy);
-
-            const phase = getPhase();
-
-            // 阶段视觉变化
-            if (phase === 0) {
-                body.className = '';
-                setPetColors('#ff80ab', '#4a148c', 0, 0);
-            } else if (phase === 1) {
-                body.className = 'phase-1';
-                setPetColors('#9c27b0', '#fff', 0.5, 0.2);
-                // 随机故障文字
-                document.title = Math.random() > 0.9 ? "R_N" : "MoeMoe Alien";
-                if(Math.random() > 0.8) glitchScreen();
-            } else {
-                body.className = 'phase-2';
-                setPetColors('#3e0404', '#ff0000', 1, 1);
-                // 音乐变调
-                if(audioCtx && audioCtx.state === 'running') updateMusicPitch(0.5);
+        function changeNoise() {
+            const src = sounds[ui.noiseSelector.value];
+            if (ui.bgm.src !== src) {
+                const playing = !ui.bgm.paused; ui.bgm.src = src;
+                if (playing || state.isFocusing) ui.bgm.play();
             }
         }
-
-        function updateBar(el, value) {
-            el.style.width = value + '%';
-            if (value > 60) el.style.backgroundColor = 'var(--bar-good)';
-            else if (value > 30) el.style.backgroundColor = 'var(--bar-mid)';
-            else el.style.backgroundColor = 'var(--bar-low)';
-        }
-
-        function setPetColors(bodyColor, eyeColor, veinOpacity, innerEyeOpacity) {
-            document.querySelector('.pet-body').style.fill = bodyColor;
-            document.querySelectorAll('.pet-eye').forEach(e => e.style.fill = eyeColor);
-            document.querySelector('.alien-vein').style.opacity = veinOpacity;
-            document.querySelectorAll('.alien-eye-inner').forEach(e => e.style.opacity = innerEyeOpacity);
-        }
-
-        function petAnim(transform, time) {
-            pet.style.transform = transform;
-            setTimeout(() => pet.style.transform = 'none', time);
-        }
-
-        function showDialog(text) {
-            dialog.innerText = text;
-            dialog.style.opacity = 1;
-            setTimeout(() => dialog.style.opacity = 0, 1000);
-        }
-
-        function glitchScreen() {
-            const screen = document.querySelector('.screen');
-            screen.style.transform = `translate(${Math.random()*4-2}px, ${Math.random()*4-2}px)`;
-            screen.style.filter = 'invert(1)';
-            setTimeout(() => {
-                screen.style.transform = 'none';
-                screen.style.filter = 'none';
-            }, 100);
-        }
-
-        // 结局判定
-        function checkEndings() {
-            // 结局1: 完全同化 (腐蚀度满)
-            if (stats.corruption >= 100) {
-                triggerEnding("ASSIMILATION COMPLETE", "The host has been successfully replaced. Thank you for your nutrition.", "#000", "#f00");
-            }
-            // 结局2: 宿主死亡 (数值过低导致怪物暴走)
-            else if ((stats.hunger <= 0 || stats.mood <= 0) && stats.corruption > 50) {
-                triggerEnding("HOST ELIMINATED", "Subject provided insufficient sustainment. Biomass consumed immediately.", "#300", "#fff");
-            }
-        }
-
-        function triggerEnding(title, desc, bg, color) {
-            gameActive = false;
-            clearInterval(loopId);
-            stopMusic();
-            
-            // 播放恐怖音效
-            playTone(100, 'sawtooth', 2);
-            
-            overlay.style.display = 'flex';
-            overlay.style.background = bg;
-            overlay.style.color = color;
-            document.getElementById('end-title').innerText = title;
-            document.getElementById('end-desc').innerText = desc;
-        }
-
-        // --- 音频引擎 (Web Audio API) ---
-        
-        function initAudio() {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContext();
-        }
-
-        function playTone(freq, type, duration) {
-            if (!audioCtx) return;
-            const osc = audioCtx.createOscillator();
-            const gain = audioCtx.createGain();
-            osc.type = type;
-            osc.frequency.value = freq;
-            osc.connect(gain);
-            gain.connect(audioCtx.destination);
-            osc.start();
-            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
-            osc.stop(audioCtx.currentTime + duration);
-        }
-
-        function playSFX(type) {
-            if (!audioCtx) return;
-            if (type === 'feed') {
-                playTone(400, 'sine', 0.1);
-                setTimeout(() => playTone(600, 'sine', 0.1), 100);
-            } else if (type === 'play') {
-                playTone(600, 'square', 0.1);
-                setTimeout(() => playTone(800, 'square', 0.1), 100);
-            } else {
-                playTone(200, 'triangle', 0.5);
-            }
-        }
-
-        // 简单的背景音乐生成
-        function playMusic(style) {
-            if (!audioCtx) return;
-            
-            // 简单的琶音旋律
-            const notes = [330, 392, 440, 494, 523, 494, 440, 392]; // E G A B C B A G
-            let noteIndex = 0;
-
-            const playNextNote = () => {
-                if(!gameActive) return;
-
-                let freq = notes[noteIndex % notes.length];
-                let type = 'sine';
-                let interval = 250;
-
-                // 根据阶段扭曲音乐
-                if (stats.corruption > 50) {
-                    freq = freq * (1 - (Math.random() * 0.1)); // 走调
-                    type = 'sawtooth'; // 刺耳
-                    interval = 250 - (stats.corruption); // 变快
-                }
-                if (stats.corruption > 80) {
-                    freq = freq / 2; // 低沉
-                }
-
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-                
-                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
-
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.2);
-
-                noteIndex++;
-                bgmTimer = setTimeout(playNextNote, interval);
-            };
-
-            playNextNote();
-        }
-
-        function stopMusic() {
-            clearTimeout(window.bgmTimer);
-        }
-        
-        function updateMusicPitch(rate) {
-            // 简易实现，实际逻辑集成在playNextNote中
+        function adjustVolume() { ui.bgm.volume = ui.volumeSlider.value; }
+        function addMessage(text, type) {
+            const div = document.createElement('div');
+            div.className = `message msg-${type}`; div.innerHTML = text;
+            ui.chatBox.appendChild(div);
+            requestAnimationFrame(() => ui.chatBox.scrollTop = ui.chatBox.scrollHeight);
         }
 
     </script>
 </body>
-
 </html>
