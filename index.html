@@ -1,349 +1,602 @@
-　　<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>恐怖拼贴画 - 鲜血版</title>
+    <title>MoeMoe Alien Pet</title>
     <style>
-        /* --- 全局设置 --- */
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
+        :root {
+            --bg-color: #f8e8f8;
+            --frame-color: #e1bee7;
+            --screen-bg: #fff0f5;
+            --text-color: #8e24aa;
+            --accent-color: #d1c4e9;
+            --bar-good: #81c784;
+            --bar-mid: #ffd54f;
+            --bar-low: #e57373;
+            --glitch-color: #ff0000;
+        }
+
         body {
             margin: 0;
-            padding: 0;
-            background-color: #050505;
-            color: #fff;
-            font-family: "Courier New", Courier, "楷体", "KaiTi", serif;
-            overflow: hidden;
             height: 100vh;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: var(--bg-color);
+            font-family: 'Press Start 2P', cursive;
+            overflow: hidden;
+            transition: background-color 2s ease;
             user-select: none;
         }
 
-        /* --- 顶部控制栏 (固定高度，防止遮挡) --- */
-        #controls {
-            height: 80px; /* 固定高度 */
-            background: #111;
-            border-bottom: 2px solid #300; /* 暗红边框 */
+        /* 游戏机外壳 */
+        .game-console {
+            width: 320px;
+            height: 500px;
+            background-color: var(--frame-color);
+            border-radius: 30px;
+            padding: 20px;
+            box-shadow: 10px 10px 0px rgba(0,0,0,0.1);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            gap: 15px;
-            z-index: 2000; /* 确保永远在最顶层 */
-            box-shadow: 0 5px 20px rgba(0,0,0,0.9);
             position: relative;
+            transition: all 1s ease;
         }
 
-        input {
-            padding: 10px;
-            font-size: 18px;
-            background: #000;
-            border: 1px solid #444;
-            color: #ddd;
-            width: 300px;
-            outline: none;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 18px;
-            cursor: pointer;
-            background: #222;
-            color: #ccc;
-            border: 1px solid #444;
-            transition: 0.2s;
-            font-weight: bold;
-        }
-
-        button:hover {
-            background: #600;
-            color: #fff;
-            border-color: #f00;
-            box-shadow: 0 0 10px #600;
-        }
-
-        /* --- 画板区域 --- */
-        #board {
-            flex-grow: 1;
+        /* 屏幕区域 */
+        .screen {
+            width: 280px;
+            height: 280px;
+            background-color: var(--screen-bg);
+            border: 4px solid #fff;
+            border-radius: 10px;
+            margin-bottom: 20px;
             position: relative;
-            z-index: 10;
             overflow: hidden;
-            /* 稍微加一点暗红晕影 */
-            background: radial-gradient(circle at center, #111 0%, #000 100%);
+            image-rendering: pixelated;
+            transition: all 1s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
-        /* --- 纸条样式 --- */
-        .scrap {
-            position: absolute;
+        /* 状态条 */
+        .status-bar {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 10;
+        }
+
+        .stat-row {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .icon { font-size: 12px; width: 20px; }
+
+        .bar-container {
+            width: 100px;
+            height: 8px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            width: 100%;
+            background-color: var(--bar-good);
+            transition: width 0.3s, background-color 0.3s;
+        }
+
+        /* 宠物区域 */
+        .pet-container {
+            flex-grow: 1;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 15px 20px;
-            font-size: 45px;
-            font-weight: bold;
-            color: #000;
-            cursor: grab;
-            filter: drop-shadow(4px 4px 6px rgba(0,0,0,0.8));
-            transition: transform 0.1s;
-            white-space: nowrap; 
-        }
-
-        .scrap:active {
-            cursor: grabbing;
-            z-index: 9999 !important;
-        }
-
-        /* 文字层 */
-        .scrap span.text {
             position: relative;
-            z-index: 5;
         }
 
-        /* --- 血迹特效 (CSS绘制) --- */
-        .blood-stain {
-            position: absolute;
-            background-color: rgba(138, 3, 3, 0.7);
+        .pet {
+            width: 100px;
+            height: 100px;
+            transition: transform 0.2s;
+            position: relative;
+        }
+
+        /* 像素画绘制 (SVG) */
+        .pixel-svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        /* 初始可爱形态 */
+        .pet-body { fill: #ff80ab; transition: fill 1s; }
+        .pet-eye { fill: #4a148c; }
+        .pet-mouth { fill: #4a148c; }
+        .pet-blush { fill: #ff4081; opacity: 0.6; }
+        
+        /* 伪装外星形态细节 (隐藏) */
+        .alien-vein { fill: none; stroke: #8b0000; stroke-width: 2; opacity: 0; transition: opacity 1s; }
+        .alien-eye-inner { fill: #ff0000; opacity: 0; }
+
+        /* 按钮区域 */
+        .controls {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn {
+            width: 60px;
+            height: 60px;
+            border: none;
             border-radius: 50%;
-            pointer-events: none;
-            z-index: 4; /* 在文字下方 */
-            mix-blend-mode: multiply; /* 正片叠底，像渗透进去一样 */
-            filter: blur(1px);
-        }
-
-        /* 背景上的大血渍 */
-        .bg-blood {
-            position: absolute;
-            background: radial-gradient(circle, #4a0000 0%, transparent 70%);
-            opacity: 0.6;
-            pointer-events: none;
-            z-index: 1;
-            animation: drip 10s infinite alternate;
-        }
-
-        @keyframes drip {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.05); }
-        }
-
-        /* 提示语 */
-        #hint {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            color: #444;
+            background-color: #fff;
+            box-shadow: 0 4px 0 #ccc;
+            cursor: pointer;
             font-size: 20px;
-            pointer-events: none;
-            letter-spacing: 2px;
+            color: var(--text-color);
+            transition: transform 0.1s, box-shadow 0.1s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #ccc;
+        }
+
+        /* 动画类 */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .anim-bounce { animation: bounce 2s infinite; }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        @keyframes glitch-anim {
+            0% { clip-path: inset(40% 0 61% 0); }
+            20% { clip-path: inset(92% 0 1% 0); }
+            40% { clip-path: inset(43% 0 1% 0); }
+            60% { clip-path: inset(25% 0 58% 0); }
+            80% { clip-path: inset(54% 0 7% 0); }
+            100% { clip-path: inset(58% 0 43% 0); }
+        }
+
+        /* 崩坏阶段样式 */
+        body.phase-1 {
+            --bg-color: #2e2e2e;
+            --frame-color: #4a4a4a;
+            --screen-bg: #333;
+            --text-color: #fff;
+            --bar-good: #66bb6a;
+        }
+        
+        body.phase-2 {
+            --bg-color: #1a0000;
+            --frame-color: #2b0000;
+            --screen-bg: #110000;
+            --text-color: #ff0000;
+            --bar-good: #8b0000;
+            --bar-mid: #500000;
+            --bar-low: #ff0000;
+        }
+
+        body.phase-2 .pet {
+            animation: shake 2s infinite;
+        }
+        
+        body.phase-2 .screen::before {
+            content: " ";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 0, 0, 0.1);
+            pointer-events: none;
+            z-index: 5;
+            animation: flicker 0.1s infinite;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.1; }
+            50% { opacity: 0.2; }
+            100% { opacity: 0.1; }
+        }
+
+        /* 结局覆盖层 */
+        #overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            color: white;
+            text-align: center;
+            display: none;
+        }
+
+        #start-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #f8e8f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            cursor: pointer;
+            flex-direction: column;
+        }
+        
+        .blink { animation: opacityPulse 1s infinite; }
+        @keyframes opacityPulse { 0%,100%{opacity:1;} 50%{opacity:0.5;} }
+
     </style>
 </head>
 <body>
 
-    <div id="controls">
-        <input type="text" id="input-text" placeholder="输入文字... (死, RUN, 救命)" maxlength="20">
-        <button onclick="createCollage()">生成 (Cut)</button>
-        <button onclick="clearBoard()" style="font-size:14px;">清空</button>
+    <!-- 开始界面 (为了音频上下文) -->
+    <div id="start-screen">
+        <div style="font-size: 40px; color: #8e24aa; margin-bottom: 20px;">♥ P E T ♥</div>
+        <div class="blink" style="font-size: 12px; color: #8e24aa;">CLICK TO START</div>
     </div>
 
-    <div id="board">
-        <div id="hint">输入文字，点击生成，拖拽碎片...</div>
+    <!-- 结局/消息覆盖层 -->
+    <div id="overlay">
+        <h1 id="end-title">TITLE</h1>
+        <p id="end-desc" style="font-size: 10px; max-width: 80%; line-height: 1.5;"></p>
+    </div>
+
+    <div class="game-console">
+        <div class="screen">
+            <div class="status-bar">
+                <div class="stat-row">
+                    <span class="icon">🍖</span>
+                    <div class="bar-container"><div class="bar-fill" id="bar-hunger"></div></div>
+                </div>
+                <div class="stat-row">
+                    <span class="icon">🎵</span>
+                    <div class="bar-container"><div class="bar-fill" id="bar-mood"></div></div>
+                </div>
+                <div class="stat-row">
+                    <span class="icon">⚡</span>
+                    <div class="bar-container"><div class="bar-fill" id="bar-energy"></div></div>
+                </div>
+            </div>
+
+            <div class="pet-container">
+                <div class="pet anim-bounce" id="pet">
+                    <svg viewBox="0 0 100 100" class="pixel-svg">
+                        <!-- 触手/身体底层 -->
+                         <path class="alien-vein" d="M20,80 Q10,90 20,100 M80,80 Q90,90 80,100 M10,50 Q0,60 10,70" />
+                        <!-- 可爱身体 -->
+                        <path class="pet-body" d="M20,80 Q10,50 20,30 Q30,10 50,10 Q70,10 80,30 Q90,50 80,80 Q50,90 20,80 Z" />
+                        <!-- 眼睛 -->
+                        <circle class="pet-eye" cx="35" cy="45" r="5" />
+                        <circle class="pet-eye" cx="65" cy="45" r="5" />
+                        <circle class="alien-eye-inner" cx="35" cy="45" r="2" />
+                        <circle class="alien-eye-inner" cx="65" cy="45" r="2" />
+                        <!-- 腮红 -->
+                        <circle class="pet-blush" cx="25" cy="55" r="4" />
+                        <circle class="pet-blush" cx="75" cy="55" r="4" />
+                        <!-- 嘴巴 -->
+                        <path class="pet-mouth" d="M45,55 Q50,60 55,55" fill="none" stroke="#4a148c" stroke-width="2" stroke-linecap="round" />
+                    </svg>
+                </div>
+                <!-- 装饰性对话框 -->
+                <div id="dialog" style="position: absolute; top: 10px; right: 10px; font-size: 10px; color: var(--text-color); opacity: 0; transition: opacity 0.5s;">♥</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="interact('feed')">🍖</button>
+            <button class="btn" onclick="interact('play')">🥎</button>
+            <button class="btn" onclick="interact('sleep')">💤</button>
+        </div>
     </div>
 
     <script>
-        const board = document.getElementById('board');
-        const input = document.getElementById('input-text');
-        const hint = document.getElementById('hint');
+        // 游戏状态
+        let stats = {
+            hunger: 50,
+            mood: 50,
+            energy: 50,
+            corruption: 0 // 隐藏数值：外星同化度
+        };
 
-        // 字体库
-        const fontList = [
-            '"Courier New", monospace', 
-            '"Times New Roman", serif', 
-            '"Arial Black", sans-serif', 
-            '"楷体", "KaiTi", serif', 
-            '"SimHei", sans-serif'
-        ];
+        let gameActive = false;
+        let loopId;
+        let audioCtx;
+        let bgmOscillators = [];
 
-        // 纸张颜色
-        const paperColors = ['#f2f2f2', '#e6e6e6', '#d9cbb8', '#bfbfbf', '#111'];
+        // 元素引用
+        const body = document.body;
+        const pet = document.getElementById('pet');
+        const barHunger = document.getElementById('bar-hunger');
+        const barMood = document.getElementById('bar-mood');
+        const barEnergy = document.getElementById('bar-energy');
+        const dialog = document.getElementById('dialog');
+        const overlay = document.getElementById('overlay');
+        const startScreen = document.getElementById('start-screen');
 
-        // 生成不规则边缘
-        function getRandomClip() {
-            let points = [];
-            points.push(`0% 0%`);
-            points.push(`${20 + Math.random()*10}% ${Math.random()*5}%`);
-            points.push(`100% 0%`);
-            points.push(`100% 100%`);
-            points.push(`${50 + Math.random()*20}% ${95 + Math.random()*5}%`);
-            points.push(`0% 100%`);
-            return `polygon(${points.join(',')})`;
+        // 启动游戏
+        startScreen.addEventListener('click', () => {
+            startScreen.style.display = 'none';
+            initAudio();
+            gameActive = true;
+            startGameLoop();
+            playMusic('happy');
+        });
+
+        // 核心循环
+        function startGameLoop() {
+            loopId = setInterval(() => {
+                if (!gameActive) return;
+
+                // 自然衰减
+                stats.hunger -= 0.5;
+                stats.mood -= 0.5;
+                stats.energy -= 0.2;
+
+                // 腐蚀度自然增长 (随着时间推移，怪物伪装逐渐失效)
+                stats.corruption += 0.1; 
+
+                // 状态边界检查
+                checkBounds();
+                updateVisuals();
+                checkEndings();
+
+            }, 500);
         }
 
-        // 生成随机血迹形状 (使用 border-radius 模拟液体)
-        function createBloodStain(parent, size) {
-            const blood = document.createElement('div');
-            blood.className = 'blood-stain';
+        function interact(type) {
+            if (!gameActive) return;
             
-            // 随机大小和位置
-            const w = size * (0.3 + Math.random() * 0.5); 
-            const h = size * (0.3 + Math.random() * 0.5);
-            blood.style.width = w + 'px';
-            blood.style.height = h + 'px';
-            blood.style.left = (Math.random() * (100 - 30)) + '%'; // 相对父元素位置
-            blood.style.top = (Math.random() * (100 - 30)) + '%';
+            playSFX(type);
+
+            // 每次互动都会加速同化（腐蚀）
+            stats.corruption += 1.5;
+
+            switch(type) {
+                case 'feed':
+                    stats.hunger += 15;
+                    stats.energy += 2;
+                    showDialog(["Yummy!", "More...", "CONSUME"][getPhase()]);
+                    petAnim('scale(1.1)', 200);
+                    break;
+                case 'play':
+                    stats.mood += 15;
+                    stats.hunger -= 5;
+                    showDialog(["Fun!", "Obey.", "SUBMIT"][getPhase()]);
+                    petAnim('rotate(10deg)', 200);
+                    break;
+                case 'sleep':
+                    stats.energy += 20;
+                    stats.hunger -= 10;
+                    showDialog(["Zzz...", "Wait...", "DORMANCY"][getPhase()]);
+                    document.querySelector('.screen').style.filter = 'brightness(0.5)';
+                    setTimeout(() => document.querySelector('.screen').style.filter = '', 500);
+                    break;
+            }
             
-            // 液体形状：使用不同的圆角半径
-            const r1 = Math.floor(Math.random() * 40 + 30);
-            const r2 = Math.floor(Math.random() * 40 + 30);
-            const r3 = Math.floor(Math.random() * 40 + 30);
-            const r4 = Math.floor(Math.random() * 40 + 30);
-            blood.style.borderRadius = `${r1}% ${r2}% ${r3}% ${r4}% / ${r3}% ${r1}% ${r4}% ${r2}%`;
-            
-            parent.appendChild(blood);
+            checkBounds();
+            updateVisuals();
         }
 
-        // 在背景生成大的血渍装饰
-        function addBackgroundSplatter() {
-            const splatter = document.createElement('div');
-            splatter.className = 'bg-blood';
-            const size = 100 + Math.random() * 200;
-            splatter.style.width = size + 'px';
-            splatter.style.height = size + 'px';
-            splatter.style.left = Math.random() * 100 + '%';
-            splatter.style.top = Math.random() * 100 + '%';
-            
-            // 随机液体形状
-            const r1 = Math.floor(Math.random() * 100);
-            const r2 = Math.floor(Math.random() * 100);
-            splatter.style.borderRadius = `${r1}% ${100-r1}% ${r2}% ${100-r2}%`;
-            
-            board.appendChild(splatter);
+        function checkBounds() {
+            stats.hunger = Math.min(100, Math.max(0, stats.hunger));
+            stats.mood = Math.min(100, Math.max(0, stats.mood));
+            stats.energy = Math.min(100, Math.max(0, stats.energy));
+            stats.corruption = Math.min(100, Math.max(0, stats.corruption));
         }
 
-        function createCollage() {
-            const text = input.value.trim();
-            if (!text) return;
-            if(hint) hint.style.display = 'none';
+        function getPhase() {
+            if (stats.corruption < 40) return 0; // 萌系
+            if (stats.corruption < 80) return 1; // 崩坏
+            return 2; // 恐怖
+        }
 
-            // 每次生成时，背景增加一点恐怖气氛
-            if(Math.random() > 0.5) addBackgroundSplatter();
+        function updateVisuals() {
+            // 更新进度条
+            updateBar(barHunger, stats.hunger);
+            updateBar(barMood, stats.mood);
+            updateBar(barEnergy, stats.energy);
 
-            const chars = text.split('');
+            const phase = getPhase();
 
-            chars.forEach(char => {
-                if (char === ' ') return;
+            // 阶段视觉变化
+            if (phase === 0) {
+                body.className = '';
+                setPetColors('#ff80ab', '#4a148c', 0, 0);
+            } else if (phase === 1) {
+                body.className = 'phase-1';
+                setPetColors('#9c27b0', '#fff', 0.5, 0.2);
+                // 随机故障文字
+                document.title = Math.random() > 0.9 ? "R_N" : "MoeMoe Alien";
+                if(Math.random() > 0.8) glitchScreen();
+            } else {
+                body.className = 'phase-2';
+                setPetColors('#3e0404', '#ff0000', 1, 1);
+                // 音乐变调
+                if(audioCtx && audioCtx.state === 'running') updateMusicPitch(0.5);
+            }
+        }
 
-                const div = document.createElement('div');
-                div.className = 'scrap';
-                
-                // 1. 样式随机
-                const bgColor = paperColors[Math.floor(Math.random() * paperColors.length)];
-                const font = fontList[Math.floor(Math.random() * fontList.length)];
-                
-                div.style.backgroundColor = bgColor;
-                div.style.fontFamily = font;
-                
-                // 黑纸处理
-                if(bgColor === '#111') div.style.color = '#fff';
+        function updateBar(el, value) {
+            el.style.width = value + '%';
+            if (value > 60) el.style.backgroundColor = 'var(--bar-good)';
+            else if (value > 30) el.style.backgroundColor = 'var(--bar-mid)';
+            else el.style.backgroundColor = 'var(--bar-low)';
+        }
 
-                // 2. 位置计算 (关键：防止遮挡顶部)
-                // Board 的高度 - 纸条大概高度(100)
-                const boardHeight = board.clientHeight;
-                const boardWidth = board.clientWidth;
-                
-                // Y轴从 20px 开始，最多到 boardHeight - 100px
-                // 这样因为 #board 是在 #controls 下面的，所以 top:0 就已经是安全区域了
-                const y = Math.random() * (boardHeight - 120); 
-                const x = Math.random() * (boardWidth - 100);
+        function setPetColors(bodyColor, eyeColor, veinOpacity, innerEyeOpacity) {
+            document.querySelector('.pet-body').style.fill = bodyColor;
+            document.querySelectorAll('.pet-eye').forEach(e => e.style.fill = eyeColor);
+            document.querySelector('.alien-vein').style.opacity = veinOpacity;
+            document.querySelectorAll('.alien-eye-inner').forEach(e => e.style.opacity = innerEyeOpacity);
+        }
 
-                div.style.left = x + 'px';
-                div.style.top = y + 'px';
-                
-                const rot = Math.random() * 40 - 20;
-                div.style.transform = `rotate(${rot}deg)`;
-                div.style.clipPath = getRandomClip();
+        function petAnim(transform, time) {
+            pet.style.transform = transform;
+            setTimeout(() => pet.style.transform = 'none', time);
+        }
 
-                // 3. 内部文字
-                const span = document.createElement('span');
-                span.className = 'text';
-                span.innerText = char;
-                div.appendChild(span);
+        function showDialog(text) {
+            dialog.innerText = text;
+            dialog.style.opacity = 1;
+            setTimeout(() => dialog.style.opacity = 0, 1000);
+        }
 
-                // 4. 血迹效果逻辑
-                // 几率产生血字
-                if (Math.random() < 0.2) {
-                    div.style.color = '#8a0000';
-                    div.style.textShadow = '1px 1px 0px #000';
-                    if(bgColor === '#111') div.style.backgroundColor = '#2a0000';
+        function glitchScreen() {
+            const screen = document.querySelector('.screen');
+            screen.style.transform = `translate(${Math.random()*4-2}px, ${Math.random()*4-2}px)`;
+            screen.style.filter = 'invert(1)';
+            setTimeout(() => {
+                screen.style.transform = 'none';
+                screen.style.filter = 'none';
+            }, 100);
+        }
+
+        // 结局判定
+        function checkEndings() {
+            // 结局1: 完全同化 (腐蚀度满)
+            if (stats.corruption >= 100) {
+                triggerEnding("ASSIMILATION COMPLETE", "The host has been successfully replaced. Thank you for your nutrition.", "#000", "#f00");
+            }
+            // 结局2: 宿主死亡 (数值过低导致怪物暴走)
+            else if ((stats.hunger <= 0 || stats.mood <= 0) && stats.corruption > 50) {
+                triggerEnding("HOST ELIMINATED", "Subject provided insufficient sustainment. Biomass consumed immediately.", "#300", "#fff");
+            }
+        }
+
+        function triggerEnding(title, desc, bg, color) {
+            gameActive = false;
+            clearInterval(loopId);
+            stopMusic();
+            
+            // 播放恐怖音效
+            playTone(100, 'sawtooth', 2);
+            
+            overlay.style.display = 'flex';
+            overlay.style.background = bg;
+            overlay.style.color = color;
+            document.getElementById('end-title').innerText = title;
+            document.getElementById('end-desc').innerText = desc;
+        }
+
+        // --- 音频引擎 (Web Audio API) ---
+        
+        function initAudio() {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
+        }
+
+        function playTone(freq, type, duration) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.value = freq;
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function playSFX(type) {
+            if (!audioCtx) return;
+            if (type === 'feed') {
+                playTone(400, 'sine', 0.1);
+                setTimeout(() => playTone(600, 'sine', 0.1), 100);
+            } else if (type === 'play') {
+                playTone(600, 'square', 0.1);
+                setTimeout(() => playTone(800, 'square', 0.1), 100);
+            } else {
+                playTone(200, 'triangle', 0.5);
+            }
+        }
+
+        // 简单的背景音乐生成
+        function playMusic(style) {
+            if (!audioCtx) return;
+            
+            // 简单的琶音旋律
+            const notes = [330, 392, 440, 494, 523, 494, 440, 392]; // E G A B C B A G
+            let noteIndex = 0;
+
+            const playNextNote = () => {
+                if(!gameActive) return;
+
+                let freq = notes[noteIndex % notes.length];
+                let type = 'sine';
+                let interval = 250;
+
+                // 根据阶段扭曲音乐
+                if (stats.corruption > 50) {
+                    freq = freq * (1 - (Math.random() * 0.1)); // 走调
+                    type = 'sawtooth'; // 刺耳
+                    interval = 250 - (stats.corruption); // 变快
+                }
+                if (stats.corruption > 80) {
+                    freq = freq / 2; // 低沉
                 }
 
-                // 几率在纸条上滴血 (40%几率)
-                if (Math.random() < 0.4) {
-                    createBloodStain(div, 60); // 60是参考大小
-                }
-                // 偶尔有大血块
-                if (Math.random() < 0.1) {
-                    createBloodStain(div, 100);
-                }
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
 
-                dragElement(div);
-                board.appendChild(div);
-            });
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
 
-            input.value = '';
+                noteIndex++;
+                bgmTimer = setTimeout(playNextNote, interval);
+            };
+
+            playNextNote();
         }
 
-        function clearBoard() {
-            board.innerHTML = '';
-            board.appendChild(hint);
-            hint.style.display = 'block';
-        }
-
-        // 通用拖拽函数
-        function dragElement(elmnt) {
-            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-            elmnt.onmousedown = dragMouseDown;
-
-            function dragMouseDown(e) {
-                e = e || window.event;
-                e.preventDefault();
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-                document.onmouseup = closeDragElement;
-                document.onmousemove = elementDrag;
-                
-                // 拖拽时放大、旋转归零、置顶
-                elmnt.style.zIndex = 10000;
-                elmnt.style.transform = `scale(1.1) rotate(0deg)`;
-                elmnt.style.transition = 'none'; // 移除过渡让拖拽更跟手
-            }
-
-            function elementDrag(e) {
-                e = e || window.event;
-                e.preventDefault();
-                pos1 = pos3 - e.clientX;
-                pos2 = pos4 - e.clientY;
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-                
-                // 边界检查（可选，这里允许稍微拖出去一点）
-                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-            }
-
-            function closeDragElement() {
-                document.onmouseup = null;
-                document.onmousemove = null;
-                // 放下时恢复随机旋转
-                const rot = Math.random() * 40 - 20;
-                elmnt.style.transform = `scale(1) rotate(${rot}deg)`;
-                elmnt.style.transition = 'transform 0.1s';
-                elmnt.style.zIndex = "100";
-            }
+        function stopMusic() {
+            clearTimeout(window.bgmTimer);
         }
         
-        input.addEventListener("keypress", function(event) {
-            if (event.key === "Enter") createCollage();
-        });
+        function updateMusicPitch(rate) {
+            // 简易实现，实际逻辑集成在playNextNote中
+        }
+
     </script>
 </body>
 </html>
-
