@@ -1674,13 +1674,12 @@
             const d = new Date(pred.nextStart);
             const diff = Math.ceil((pred.nextStart - Date.now()) / (1000*3600*24));
             const text = diff > 0 ? `还有 ${diff} 天` : (diff === 0 ? "预计就在今天" : "可能已推迟");
-            predDiv.innerHTML = `预测: 下次约 <span class="period-info-highlight">${d.getMonth()+1}.${d.getDate()}</span> (${text})<br>平均周期: ${pred.cycleLength} 天`;
+            predDiv.innerHTML = `下次约 <span class="period-info-highlight">${d.getMonth()+1}.${d.getDate()}</span> (${text})<br>平均周期: ${pred.cycleLength} 天`;
         } else {
-            predDiv.innerHTML = "预测: 记录不足，暂无预测";
+            predDiv.innerHTML = "记录不足，暂无预测";
         }
     }
 
-    // 操作处理
 // 操作处理 (增加未来日期禁止逻辑)
     function setPeriodAction(action) {
         if (!state.selectedDateObj) return showToast("请先选择日期");
@@ -1708,8 +1707,8 @@
             } else {
                 playerData.periodLogs.push({ startDate: targetTime, endDate: null });
                 saveData();
-                showToast("已标记：经期开始");
-                addMessage("已记录。多喝热水。", "bartender");
+                showToast("经期开始");
+                addMessage("啊……我去给您拿杯红糖水。奶茶？那可不行。", "bartender");
             }
         }
         else if (action === 'end') {
@@ -1843,4 +1842,5 @@
 </script>
 </body>
 </html>
+
 
