@@ -20,6 +20,7 @@
             --period-predict: #ffb8c1;
             --ovulation-color: #a29bfe;
             --shadow-color: rgba(0,0,0,0.5);
+            --toast-bg: rgba(50, 50, 50, 0.9);
         }
 
         /* 日间模式 */
@@ -32,6 +33,7 @@
             --text-dim: #666;
             --card-bg: #ffffff;
             --shadow-color: rgba(0,0,0,0.15);
+            --toast-bg: rgba(255, 255, 255, 0.95);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -56,6 +58,8 @@
         /* 动画 */
         @keyframes modal-in { from { transform: translate(-50%, -40%) scale(0.95); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes toast-in { from { opacity: 0; transform: translateY(-20px) translateX(-50%); } to { opacity: 1; transform: translateY(0) translateX(-50%); } }
+        @keyframes toast-out { from { opacity: 1; transform: translateY(0) translateX(-50%); } to { opacity: 0; transform: translateY(-20px) translateX(-50%); } }
         @keyframes alert-flash { 0% { box-shadow: inset 0 0 0 rgba(212, 175, 55, 0); } 50% { box-shadow: inset 0 0 80px rgba(212, 175, 55, 0.4); } 100% { box-shadow: inset 0 0 0 rgba(212, 175, 55, 0); } }
         .flash-active { animation: alert-flash 1.2s ease-in-out 3; }
         @keyframes coin-pop { 0% { transform: scale(1); } 50% { transform: scale(1.3); color: #fff; } 100% { transform: scale(1); } }
@@ -151,8 +155,6 @@
         .time-setter { display: flex; align-items: center; color: var(--text-dim); font-size: 0.9em; }
         .time-input { background: rgba(0,0,0,0.2); border: 1px solid #555; color: var(--text-main); width: 50px; text-align: center; padding: 5px; margin: 0 8px; border-radius: 4px; font-size: 1.1em; font-weight: bold; }
         
-        /* 专注标签按钮已删除 */
-        
         .action-row { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         button.action-btn {
             background: rgba(255,255,255,0.06); border: 1px solid #555; color: var(--text-dim); padding: 14px 0;
@@ -166,6 +168,24 @@
         select { background: transparent; border: none; color: var(--text-dim); flex: 1; font-size: 0.9em; outline: none; }
         option { background: #222; color: #ccc; }
         input[type="range"] { width: 80px; accent-color: var(--accent-color); }
+
+        /* === 提示系统 (Toast) === */
+        #toast-container {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 2000; display: flex; flex-direction: column; gap: 10px; pointer-events: none;
+            width: 80%; max-width: 300px; align-items: center;
+        }
+        .toast-message {
+            background: var(--toast-bg); color: var(--text-main);
+            padding: 8px 16px; border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+            font-size: 0.9em; letter-spacing: 0.5px;
+            animation: toast-in 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+            opacity: 0;
+        }
+        .toast-message.hiding { animation: toast-out 0.3s ease-in forwards; }
 
         /* === 模态框通用 === */
         .modal-overlay {
@@ -213,12 +233,28 @@
         .store-tab { flex: 1; padding: 10px; cursor: pointer; color: var(--text-dim); border-bottom: 2px solid transparent; }
         .store-tab.active { color: var(--accent-color); border-bottom-color: var(--accent-color); }
         .store-grid { display: grid; grid-template-columns: 1fr; gap: 10px; max-height: 300px; overflow-y: auto; text-align: left; padding-right: 5px; }
-        .store-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center; }
-        .store-item.disabled { opacity: 0.5; pointer-events: none; }
+        
+        .store-item { 
+            background: rgba(255,255,255,0.05); padding: 10px; border-radius: 6px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            transition: all 0.3s;
+        }
+        /* 商店不可购买状态 - 明暗区分 */
+        .store-item.disabled { 
+            opacity: 0.5; 
+            filter: grayscale(0.8);
+            background: rgba(0,0,0,0.1);
+        }
+        .store-item.disabled .item-name { color: #888; }
+        .store-item.disabled .buy-btn { 
+            background: transparent; border-color: #555; color: #777; 
+            cursor: not-allowed; 
+        }
+
         .item-info { display: flex; flex-direction: column; flex: 1; margin-right: 10px; }
         .item-name { font-weight: bold; color: var(--text-main); font-size: 0.95em; }
         .item-desc { font-size: 0.75em; color: var(--text-dim); margin-top: 3px; }
-        .buy-btn { background: #333; color: #ffdb4d; border: 1px solid #555; padding: 5px 12px; border-radius: 4px; font-size: 0.85em; cursor: pointer; white-space: nowrap; }
+        .buy-btn { background: #333; color: #ffdb4d; border: 1px solid #555; padding: 5px 12px; border-radius: 4px; font-size: 0.85em; cursor: pointer; white-space: nowrap; transition: all 0.2s;}
 
         /* 标签 & 待办列表 */
         .todo-list-container { list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-y: auto; text-align: left; margin-bottom: 15px; }
@@ -302,6 +338,9 @@
     <div class="vignette"></div>
 
     <div class="app-container" id="main-container">
+        <!-- Toast Container -->
+        <div id="toast-container"></div>
+
         <!-- Header -->
         <div class="header-area">
             <button class="theme-toggle-btn" onclick="toggleTheme()">☀️/🌙</button>
@@ -334,8 +373,6 @@
                     专注 <input type="number" class="time-input" id="custom-minutes" value="25" min="1" max="180"> 分钟
                 </div>
             </div>
-
-            <!-- 原“设定专注内容”大按钮已删除 -->
 
             <div class="action-row">
                 <button class="action-btn primary" id="focus-btn" onclick="toggleFocus()">开始专注</button>
@@ -495,7 +532,6 @@
             customInput: document.getElementById('custom-minutes'),
             timeSetterBox: document.getElementById('time-setter-box'),
             // Focus Tag UI
-            focusTagLabel: null, // 元素已删除，设为null
             modalTags: document.getElementById('modal-tags'),
             tagsList: document.getElementById('tags-list'),
             newTagInput: document.getElementById('new-tag-input'),
@@ -534,7 +570,9 @@
             diaryEditorView: document.getElementById('diary-editor-view'),
             diaryText: document.getElementById('diary-text'),
             newDiaryBtn: document.getElementById('new-diary-btn'),
-            backDiaryBtn: document.getElementById('back-diary-btn')
+            backDiaryBtn: document.getElementById('back-diary-btn'),
+            // Toast
+            toastContainer: document.getElementById('toast-container')
         };
 
         const sounds = {
@@ -549,13 +587,6 @@
             'angelfish': { name: '神仙鱼', icon: '🐚', price: 80, desc: '体态优雅侧扁，游动时如风中落叶。' },
             'discus': { name: '七彩神仙', icon: '🪸', price: 150, desc: '热带鱼之王，体色艳丽，需要精心照料。' }
         };
-
-        const SPECIAL_DRINKS = [
-            { id: 'drink_old', name: '昨日雨', price: 5, desc: '苦艾与冰滴咖啡', quote: '这场雨下在过去，淋湿的却是现在。' },
-            { id: 'drink_star', name: '液态星光', price: 8, desc: '柠檬与奎宁水', quote: '我们都是阴沟里的虫子，但总有人仰望星空。' },
-            { id: 'drink_mute', name: '沉默者', price: 6, desc: '极度冰镇的伏特加', quote: '有时候，不说话就是最好的回答。' },
-            { id: 'drink_warm', name: '壁炉', price: 5, desc: '热红酒与肉桂', quote: '希望这杯酒能暖一暖你疲惫的灵魂。' }
-        ];
 
         const chatTopics = [
             { id: 'tired', user: ["我觉得有点累。", "今天过得好漫长。", "能量耗尽了。"] },
@@ -636,6 +667,22 @@
             });
         };
         
+        // --- 轻提示 (Toast) 系统 ---
+        function showToast(text, duration = 3000) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-message';
+            toast.innerText = text;
+            ui.toastContainer.appendChild(toast);
+            
+            // 自动移除
+            setTimeout(() => {
+                toast.classList.add('hiding');
+                toast.addEventListener('animationend', () => {
+                    if(toast.parentNode) toast.parentNode.removeChild(toast);
+                });
+            }, duration);
+        }
+
         // 主题切换
         function toggleTheme() {
             playerData.isDayMode = !playerData.isDayMode;
@@ -656,6 +703,7 @@
                  return;
             }
             if ("geolocation" in navigator) {
+                // 不使用 Toast，保留聊天记录
                 addMessage("（Cipher 望向窗外）正在确认外面的天气...", "event");
                 navigator.geolocation.getCurrentPosition(async (pos) => {
                     try {
@@ -724,7 +772,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a'); a.href = url; a.download = `driftwood_backup_${new Date().toISOString().slice(0,10)}.json`;
             document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
-            addMessage("存档文件已生成。", "event");
+            showToast("存档文件已生成并下载");
         }
 
         function triggerImport() { document.getElementById('file-input').click(); }
@@ -751,7 +799,7 @@
             reader.readAsText(file); input.value = '';
         }
 
-        // --- 专注标签系统 (按钮式) ---
+        // --- 专注标签系统 ---
         function openTagModal() {
             ui.modalTags.classList.add('open');
             renderTags();
@@ -784,6 +832,7 @@
                 ui.newTagInput.value = '';
                 saveData();
                 renderTags();
+                showToast(`已添加标签: ${val}`);
             }
         }
         
@@ -792,7 +841,6 @@
                 playerData.tags = playerData.tags.filter(t => t !== tag);
                 if(state.currentFocusTag === tag) {
                     state.currentFocusTag = "默认";
-                    // 移除对不存在按钮的文本更新
                 }
                 saveData();
                 renderTags();
@@ -801,11 +849,11 @@
         
         function selectTag(tag) {
             state.currentFocusTag = tag;
-            // 移除对不存在按钮的文本更新
             closeTagModal();
+            showToast(`专注内容已设定为: ${tag}`, 2000);
         }
 
-        // --- 待办清单系统 (弹窗化) ---
+        // --- 待办清单系统 ---
         function openTodoModal() { 
             ui.modalTodo.classList.add('open'); 
             renderTodoList();
@@ -859,7 +907,6 @@
             state.timeLeft = m * 60; state.initialTime = state.timeLeft; state.elapsedFocusTime = 0; state.isFocusing = true;
             
             ui.focusBtn.innerText = "停止专注"; ui.focusBtn.classList.add('active-state'); ui.timeSetterBox.style.display = 'none';
-            // 移除了隐藏标签按钮的代码，因为按钮已删除
 
             ui.statusText.innerText = "Cipher 将沙漏倒置...";
             initAudioContext(); ui.bgm.play().catch(e=>{});
@@ -872,7 +919,9 @@
                 
                 // 1分钟1金币
                 if (state.elapsedFocusTime>0 && state.elapsedFocusTime%60===0) {
-                    playerData.coins++; updateCoinUI(); triggerAlert("获得专注奖励：1 金币", false);
+                    playerData.coins++; updateCoinUI(); 
+                    // 这里专注奖励用Toast，不要在聊天里一直弹
+                    showToast("专注奖励：+1 金币", 2000);
                     ui.coinCount.classList.add('coin-anim'); setTimeout(()=>ui.coinCount.classList.remove('coin-anim'),300); saveData();
                 }
                 if (state.timeLeft<=0) finishFocus();
@@ -891,12 +940,16 @@
             
             state.completedCount++; 
             ui.bgm.pause(); saveData();
+            
+            // 如果商店开着，可能钱够买新东西了，刷新一下
+            if(ui.modalStore.classList.contains('open') && document.querySelector('.store-tab.active').innerText === '货架') {
+                renderShopItems();
+            }
         }
         function resetUI() { 
             ui.focusBtn.innerText="开始专注"; 
             ui.focusBtn.classList.remove('active-state'); 
             ui.timeSetterBox.style.display='flex';
-            // 移除了显示标签按钮的代码，因为按钮已删除
         }
         function updateCoinUI() { ui.coinCount.innerText=playerData.coins; ui.storeCoinCount.innerText=playerData.coins; }
 
@@ -1109,29 +1162,33 @@
             
             // 添加鱼粮
             const foodItem = document.createElement('div');
-            foodItem.className = 'store-item';
+            const canAffordFood = playerData.coins >= 5;
+            foodItem.className = `store-item ${!canAffordFood ? 'disabled' : ''}`;
             foodItem.innerHTML = `
                 <div class="item-info">
                     <div class="item-name">🐟 鱼粮 (10份)</div>
                     <div class="item-desc">喂食你的小鱼，保持它们的活力</div>
                 </div>
-                <button class="buy-btn" onclick="buyFishFood()">🪙 5</button>
+                <button class="buy-btn" onclick="buyFishFood()" ${!canAffordFood ? 'disabled' : ''}>
+                    ${canAffordFood ? '🪙 5' : '余额不足'}
+                </button>
             `;
             ui.tabShop.appendChild(foodItem);
             
             // 添加各种鱼
             Object.entries(FISH_TYPES).forEach(([type, fish]) => {
                 const item = document.createElement('div');
-                item.className = 'store-item';
                 const canAfford = playerData.coins >= fish.price;
-                if (!canAfford) item.classList.add('disabled');
+                item.className = `store-item ${!canAfford ? 'disabled' : ''}`;
                 
                 item.innerHTML = `
                     <div class="item-info">
                         <div class="item-name">${fish.icon} ${fish.name}</div>
                         <div class="item-desc">${fish.desc}</div>
                     </div>
-                    <button class="buy-btn" onclick="buyFish('${type}')" ${!canAfford ? 'disabled' : ''}>🪙 ${fish.price}</button>
+                    <button class="buy-btn" onclick="buyFish('${type}')" ${!canAfford ? 'disabled' : ''}>
+                        ${canAfford ? `🪙 ${fish.price}` : '余额不足'}
+                    </button>
                 `;
                 ui.tabShop.appendChild(item);
             });
@@ -1144,9 +1201,9 @@
                 updateCoinUI();
                 saveData();
                 renderShopItems();
-                addMessage("购买了鱼粮。", "event");
+                showToast("已购买：鱼粮 (10份)");
             } else {
-                addMessage("金币不足。", "bartender");
+                showToast("金币不足");
             }
         }
         
@@ -1155,7 +1212,7 @@
             if (!fish) return;
             
             if (!free && playerData.coins < fish.price) {
-                addMessage("金币不足。", "bartender");
+                showToast("金币不足");
                 return;
             }
             
@@ -1181,6 +1238,8 @@
             renderPetTab();
             
             if (!free) {
+                showToast(`购买成功：${fish.name}`);
+            } else {
                 addMessage(`获得了新的 ${fish.icon} ${fish.name}！`, "event");
             }
         }
@@ -1234,7 +1293,7 @@
         
         function feedFish(fishId) {
             if (playerData.inventory.fishFood <= 0) {
-                addMessage("没有鱼粮了。", "bartender");
+                showToast("没有鱼粮了");
                 return;
             }
             
@@ -1245,7 +1304,7 @@
                 playerData.inventory.fishFood--;
                 saveData();
                 renderPetTab();
-                addMessage(`喂食了 ${fish.icon} ${fish.name}。`, "event");
+                showToast(`喂食了 ${fish.name}`);
             }
         }
         
@@ -1256,7 +1315,7 @@
                 fish.lastPlayed = Date.now();
                 saveData();
                 renderPetTab();
-                addMessage(`和 ${fish.icon} ${fish.name} 玩耍了一会儿。`, "event");
+                showToast(`和 ${fish.name} 玩耍了一会儿`);
             }
         }
         
@@ -1387,7 +1446,7 @@
         
         function logPeriodStart() {
             if (isPeriodActive()) {
-                addMessage("已经在生理期记录中了。", "bartender");
+                showToast("已经在生理期记录中");
                 return;
             }
             
@@ -1400,12 +1459,16 @@
             updatePeriodStatus();
             renderPeriodCalendar();
             renderPeriodHistory();
-            addMessage("记录了生理期开始。多注意休息。", "bartender");
+            
+            // 系统提示
+            showToast("记录成功：生理期开始");
+            // 角色关怀
+            addMessage("已记录。多注意休息，需要红糖水就告诉我。", "bartender");
         }
         
         function logPeriodEnd() {
             if (!isPeriodActive()) {
-                addMessage("当前没有活跃的生理期记录。", "bartender");
+                showToast("当前没有进行中的记录");
                 return;
             }
             
@@ -1416,7 +1479,9 @@
             updatePeriodStatus();
             renderPeriodCalendar();
             renderPeriodHistory();
-            addMessage("记录了生理期结束。", "bartender");
+            
+            showToast("记录成功：生理期结束");
+            addMessage("身体舒服些了吗？", "bartender");
         }
         
         function deletePeriodLog(index) {
@@ -1426,13 +1491,14 @@
                 renderPeriodHistory();
                 renderPeriodCalendar();
                 updatePeriodStatus();
+                showToast("记录已删除");
             }
         }
         
         function retroAddPeriodStart() {
             const dateStr = ui.periodAddDate.value;
             if (!dateStr) {
-                addMessage("请选择日期。", "bartender");
+                showToast("请选择日期");
                 return;
             }
             
@@ -1446,18 +1512,18 @@
             updatePeriodStatus();
             renderPeriodCalendar();
             renderPeriodHistory();
-            addMessage("补录了生理期开始。", "bartender");
+            showToast("补录成功：开始日期");
         }
         
         function retroAddPeriodEnd() {
             const dateStr = ui.periodAddDate.value;
             if (!dateStr) {
-                addMessage("请选择日期。", "bartender");
+                showToast("请选择日期");
                 return;
             }
             
             if (!isPeriodActive()) {
-                addMessage("当前没有活跃的生理期记录。", "bartender");
+                showToast("没有进行中的记录可结束");
                 return;
             }
             
@@ -1469,7 +1535,7 @@
             updatePeriodStatus();
             renderPeriodCalendar();
             renderPeriodHistory();
-            addMessage("补录了生理期结束。", "bartender");
+            showToast("补录成功：结束日期");
         }
 
         // --- 日记系统 ---
@@ -1546,7 +1612,7 @@
         function saveDiaryEntry() {
             const content = ui.diaryText.value.trim();
             if (!content) {
-                addMessage("日记内容不能为空。", "bartender");
+                showToast("日记内容不能为空");
                 return;
             }
             
@@ -1568,12 +1634,11 @@
             
             saveData();
             showDiaryList();
-            addMessage("日记已保存。", "event");
+            showToast("日记已保存");
         }
         
         function deleteCurrentEntry() {
             if (!state.currentDiaryId) {
-                addMessage("没有可删除的日记。", "bartender");
                 return;
             }
             
@@ -1581,7 +1646,7 @@
                 playerData.diaryEntries = playerData.diaryEntries.filter(e => e.id !== state.currentDiaryId);
                 saveData();
                 showDiaryList();
-                addMessage("日记已删除。", "event");
+                showToast("日记已删除");
             }
         }
 
