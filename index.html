@@ -53,24 +53,11 @@
             transition: background-image 0.5s ease;
         }
 
-        /* 动画定义 */
-        @keyframes alert-flash {
-            0% { box-shadow: inset 0 0 0 rgba(212, 175, 55, 0); }
-            50% { box-shadow: inset 0 0 80px rgba(212, 175, 55, 0.4); }
-            100% { box-shadow: inset 0 0 0 rgba(212, 175, 55, 0); }
-        }
+        @keyframes modal-in { from { transform: translate(-50%, -40%) scale(0.95); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes alert-flash { 0% { box-shadow: inset 0 0 0 rgba(212, 175, 55, 0); } 50% { box-shadow: inset 0 0 80px rgba(212, 175, 55, 0.4); } 100% { box-shadow: inset 0 0 0 rgba(212, 175, 55, 0); } }
         .flash-active { animation: alert-flash 1.2s ease-in-out 3; }
-
-        @keyframes modal-in {
-            from { transform: translate(-50%, -40%) scale(0.95); opacity: 0; }
-            to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        }
-
-        @keyframes coin-pop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3); color: #fff; }
-            100% { transform: scale(1); }
-        }
+        @keyframes coin-pop { 0% { transform: scale(1); } 50% { transform: scale(1.3); color: #fff; } 100% { transform: scale(1); } }
         .coin-anim { animation: coin-pop 0.3s ease-out; }
 
         .vignette {
@@ -118,9 +105,9 @@
         }
         body.day-mode .coin-status { color: #d6b028; }
 
-        /* 导航行 */
+        /* 导航行 - 6个按钮 */
         .nav-row {
-            display: flex; justify-content: center; gap: 15px;
+            display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
             margin-top: 15px; padding-top: 12px;
             border-top: 1px solid var(--glass-border);
         }
@@ -128,13 +115,13 @@
             background: transparent;
             border: 1px solid var(--glass-border);
             color: var(--text-dim);
-            padding: 6px 16px; border-radius: 4px; font-size: 0.85em;
+            padding: 6px 12px; border-radius: 4px; font-size: 0.85em;
             cursor: pointer; transition: all 0.2s; font-family: inherit; letter-spacing: 1px;
         }
         .nav-btn:hover { color: var(--accent-color); border-color: var(--accent-color); background: rgba(255,255,255,0.05); }
         .nav-btn.special { color: var(--period-color); border-color: rgba(255, 107, 129, 0.3); }
 
-        /* 2. Chat */
+        /* 2. Chat (Expanded) */
         .chat-area {
             flex: 1; overflow-y: auto; padding: 15px;
             display: flex; flex-direction: column; gap: 12px;
@@ -145,52 +132,26 @@
             border-radius: 8px; animation: slideIn 0.3s cubic-bezier(0.25, 1, 0.5, 1);
             word-wrap: break-word;
         }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
         .msg-bartender { align-self: flex-start; color: #dcdcdc; border-left: 3px solid var(--accent-color); background: rgba(255, 255, 255, 0.05); margin-right: 20px; }
         .msg-user { align-self: flex-end; background-color: rgba(212, 175, 55, 0.15); color: #ddd; text-align: right; margin-left: 20px; }
         .msg-event { align-self: center; font-size: 0.85em; color: var(--accent-color); font-style: italic; opacity: 0.7; margin: 5px 0; text-align: center; }
-
         body.day-mode .msg-bartender { color: #333; background: rgba(0,0,0,0.05); }
         body.day-mode .msg-user { color: #222; background: rgba(176, 141, 85, 0.2); }
-
-        /* 3. Mid Section */
-        .mid-section { padding: 0 15px 10px; flex-shrink: 0; }
-        .panel-box {
-            background: rgba(0, 0, 0, 0.1); padding: 10px;
-            border-radius: 8px; border: 1px solid var(--glass-border);
-        }
-        .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .panel-title { font-size: 0.85em; color: var(--text-dim); letter-spacing: 1px; }
-        
-        .open-todo-btn {
-            background: rgba(255,255,255,0.1); border: 1px solid #777; color: var(--text-main);
-            padding: 4px 12px; border-radius: 20px; font-size: 0.85em; cursor: pointer; transition: all 0.2s;
-        }
-        .list-container { list-style: none; padding: 0; margin: 0; max-height: 80px; overflow-y: auto; }
-        .list-item { display: flex; align-items: center; padding: 6px 0; font-size: 0.9em; border-bottom: 1px solid var(--glass-border); }
-        .list-item.completed span { text-decoration: line-through; color: var(--text-dim); }
-        .list-item input[type="checkbox"] { margin-right: 10px; accent-color: var(--accent-color); }
-        .del-btn { margin-left: auto; background: transparent; border: none; color: var(--text-dim); font-size: 1.4em; padding: 0 10px; cursor: pointer; }
 
         /* 4. Controls */
         .controls-area {
             padding: 15px 20px 25px; background: var(--glass-bg);
             border-top: 1px solid var(--glass-border); flex-shrink: 0;
         }
-        .timer-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .timer-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
         .timer-display { font-size: 2em; color: var(--accent-color); font-variant-numeric: tabular-nums; font-weight: bold; }
         .time-setter { display: flex; align-items: center; color: var(--text-dim); font-size: 0.9em; }
         .time-input { background: rgba(0,0,0,0.2); border: 1px solid #555; color: var(--text-main); width: 50px; text-align: center; padding: 5px; margin: 0 8px; border-radius: 4px; font-size: 1.1em; font-weight: bold; }
         
-        /* 专注内容选择按钮 */
-        .focus-tag-btn {
-            width: 100%; background: rgba(0,0,0,0.1); border: 1px solid var(--glass-border);
-            color: var(--text-main); font-size: 0.95em; padding: 10px; margin-bottom: 12px; 
-            border-radius: 6px; cursor: pointer; transition: all 0.2s; text-align: center;
+        .current-tag-display {
+            text-align: left; font-size: 0.8em; color: var(--text-dim); 
+            margin-bottom: 12px; height: 1.2em; display: flex; align-items: center; gap: 5px;
         }
-        .focus-tag-btn:hover { border-color: var(--accent-color); color: var(--accent-color); }
-        .focus-tag-btn:active { transform: scale(0.98); }
 
         .action-row { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         button.action-btn {
@@ -206,13 +167,28 @@
         option { background: #222; color: #ccc; }
         input[type="range"] { width: 80px; accent-color: var(--accent-color); }
 
-        /* === 模态框 === */
+        /* === 模态框通用 === */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
             z-index: 100; display: none; opacity: 0; transition: opacity 0.3s;
         }
         .modal-overlay.open { display: block; opacity: 1; }
+
+        /* 输入弹窗基础样式 (用于 商店、待办、标签、生理期) */
+        .input-modal {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 90%; max-width: 360px; background: var(--card-bg); border: 1px solid #444;
+            color: var(--text-main); padding: 20px; border-radius: 12px;
+            box-shadow: 0 10px 40px var(--shadow-color); animation: modal-in 0.3s ease-out; text-align: center;
+        }
+        .input-modal h3 { margin: 0 0 15px 0; color: var(--accent-color); font-weight: normal; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center;}
+        
+        .modal-actions { display: flex; gap: 10px; justify-content: center; margin-top: 15px;}
+        .modal-btn { flex: 1; padding: 10px 0; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9em; }
+        .modal-btn.confirm { background: var(--accent-color); color: #000; font-weight: bold; }
+        .modal-btn.cancel { background: #333; color: #ccc; }
+        .input-field { width: 100%; background: #252525; border: 1px solid #555; color: #fff; padding: 10px; border-radius: 6px; font-size: 1em; margin-bottom: 20px; outline: none; }
 
         /* 账单 & 统计 */
         .receipt-modal {
@@ -223,33 +199,20 @@
             max-height: 85vh; overflow-y: auto;
         }
         .receipt-header { text-align: center; border-bottom: 2px dashed #999; padding-bottom: 10px; margin-bottom: 10px; }
-        
-        /* 新的历史记录分组样式 */
         .history-date-header { font-weight: bold; font-size: 0.85em; margin-top: 10px; padding-bottom: 2px; border-bottom: 1px solid #ccc; color: #555; }
         .receipt-list { list-style: none; padding: 0; margin: 0; max-height: 250px; overflow-y: auto; border-bottom: 2px dashed #999; font-size: 0.9em; }
-        .receipt-list::-webkit-scrollbar { width: 4px; }
-        .receipt-list::-webkit-scrollbar-thumb { background: #bbb; border-radius: 2px; }
         .history-item { display: flex; justify-content: space-between; margin-bottom: 4px; padding: 2px 0; }
         .history-item span:first-child { color: #444; }
         .history-item span:last-child { font-weight: bold; }
-
         .data-controls { margin-top: 15px; display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
         .data-btn { font-size: 0.75em; background: #ddd; border: 1px solid #999; padding: 4px 8px; cursor: pointer; color: #333; margin-bottom: 5px; }
-
         .chart-container { margin: 15px 0; text-align: center; }
         .chart-svg { max-width: 150px; max-height: 150px; margin: 0 auto; display: block; transform: rotate(-90deg); border-radius: 50%;}
         .chart-legend { font-size: 0.75em; color: #555; margin-top: 10px; text-align: left; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;}
         .legend-item { display: flex; align-items: center; gap: 4px; }
         .legend-color { width: 10px; height: 10px; display: inline-block; border-radius: 2px; }
 
-        /* 商店 & 输入 */
-        .input-modal {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 90%; max-width: 360px; background: var(--card-bg); border: 1px solid #444;
-            color: var(--text-main); padding: 20px; border-radius: 12px;
-            box-shadow: 0 10px 40px var(--shadow-color); animation: modal-in 0.3s ease-out; text-align: center;
-        }
-        .input-modal h3 { margin: 0 0 15px 0; color: var(--accent-color); font-weight: normal; letter-spacing: 1px; display: flex; justify-content: space-between; align-items: center;}
+        /* 商店 */
         .store-tabs { display: flex; border-bottom: 1px solid #444; margin-bottom: 15px; }
         .store-tab { flex: 1; padding: 10px; cursor: pointer; color: var(--text-dim); border-bottom: 2px solid transparent; }
         .store-tab.active { color: var(--accent-color); border-bottom-color: var(--accent-color); }
@@ -260,8 +223,15 @@
         .item-name { font-weight: bold; color: var(--text-main); font-size: 0.95em; }
         .item-desc { font-size: 0.75em; color: var(--text-dim); margin-top: 3px; }
         .buy-btn { background: #333; color: #ffdb4d; border: 1px solid #555; padding: 5px 12px; border-radius: 4px; font-size: 0.85em; cursor: pointer; white-space: nowrap; }
+        
+        /* 待办清单列表 */
+        .todo-list-container { list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-y: auto; text-align: left; margin-bottom: 15px; }
+        .todo-item { display: flex; align-items: center; padding: 8px 0; font-size: 0.95em; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .todo-item.completed span { text-decoration: line-through; color: var(--text-dim); }
+        .todo-item input[type="checkbox"] { margin-right: 10px; accent-color: var(--accent-color); }
+        .todo-del { margin-left: auto; background: transparent; border: none; color: #d9534f; cursor: pointer; font-size: 1.2em; }
 
-        /* 标签选择弹窗样式 */
+        /* 专注标签选择 */
         .tags-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
         .tag-chip {
             background: rgba(255,255,255,0.1); border: 1px solid #555; color: var(--text-dim);
@@ -272,7 +242,7 @@
         .tag-del { position: absolute; right: -5px; top: -5px; background: #d9534f; color: #fff; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; display: flex; justify-content: center; align-items: center; display: none;}
         .tag-chip:hover .tag-del { display: flex; }
 
-        /* 宠物 */
+        /* 宠物卡片 */
         .pet-card { background: rgba(0,0,0,0.1); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); display: flex; align-items: center; gap: 15px; }
         .pet-icon { font-size: 2.5em; animation: float 3s ease-in-out infinite; }
         .pet-stats { flex: 1; }
@@ -333,12 +303,6 @@
         }
         .diary-toolbar { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; flex-shrink: 0; }
 
-        .input-field { width: 100%; background: #252525; border: 1px solid #555; color: #fff; padding: 10px; border-radius: 6px; font-size: 1em; margin-bottom: 20px; outline: none; }
-        .modal-actions { display: flex; gap: 10px; justify-content: center; margin-top: 15px;}
-        .modal-btn { flex: 1; padding: 10px 0; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9em; }
-        .modal-btn.confirm { background: var(--accent-color); color: #000; font-weight: bold; }
-        .modal-btn.cancel { background: #333; color: #ccc; }
-
     </style>
 </head>
 <body class="">
@@ -356,28 +320,19 @@
                 <span class="coin-status">🪙 <span id="coin-count">0</span></span>
             </div>
             
-            <!-- 文字导航行 -->
+            <!-- 导航行 (含待办和内容) -->
             <div class="nav-row">
                 <button class="nav-btn" onclick="openDiary()">日记</button>
+                <button class="nav-btn" onclick="openTodoModal()">待办</button>
+                <button class="nav-btn" onclick="openTagModal()">内容</button>
                 <button class="nav-btn special" onclick="openPeriodModal()">生理期</button>
                 <button class="nav-btn" onclick="openStore()">杂货铺</button>
                 <button class="nav-btn" onclick="openHistory()">账单</button>
             </div>
         </div>
 
-        <!-- Chat -->
+        <!-- Chat (Expanded) -->
         <div class="chat-area" id="chat-box"></div>
-
-        <!-- Todo -->
-        <div class="mid-section">
-            <div class="panel-box">
-                <div class="panel-header">
-                    <span class="panel-title">待办事项</span>
-                    <button class="open-todo-btn" onclick="openTodoModal()">✎ 记一笔</button>
-                </div>
-                <ul class="list-container" id="todo-list"></ul>
-            </div>
-        </div>
 
         <!-- Controls -->
         <div class="controls-area">
@@ -388,10 +343,10 @@
                 </div>
             </div>
 
-            <!-- 专注标签选择 -->
-            <button class="focus-tag-btn" onclick="openTagModal()">
-                <span id="current-focus-tag">🏷️ 设定专注内容 (默认)</span>
-            </button>
+            <!-- 当前专注内容提示 -->
+            <div class="current-tag-display" id="current-tag-display">
+                <span style="color:var(--accent-color);">●</span> 专注内容: <span id="focus-tag-label">默认</span>
+            </div>
 
             <div class="action-row">
                 <button class="action-btn primary" id="focus-btn" onclick="toggleFocus()">开始专注</button>
@@ -409,19 +364,34 @@
         </div>
     </div>
 
-    <!-- 弹窗：专注标签选择 (新) -->
+    <!-- 弹窗：专注内容选择 (新) -->
     <div id="modal-tags" class="modal-overlay">
         <div class="input-modal">
             <h3>选择专注内容</h3>
-            <div id="tags-list" class="tags-container">
-                <!-- JS Generated -->
-            </div>
+            <div id="tags-list" class="tags-container"></div>
             <div style="display:flex; gap:5px;">
                 <input type="text" class="input-field" id="new-tag-input" placeholder="新标签..." style="margin-bottom:0;">
                 <button class="buy-btn" onclick="addNewTag()">添加</button>
             </div>
             <div class="modal-actions">
                 <button class="modal-btn cancel" onclick="closeTagModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗：待办清单 (新) -->
+    <div id="modal-todo" class="modal-overlay">
+        <div class="input-modal">
+            <h3>待办清单</h3>
+            <ul id="todo-list" class="todo-list-container">
+                <!-- JS Fill -->
+            </ul>
+            <div style="display:flex; gap:5px; margin-top:10px;">
+                <input type="text" class="input-field" id="todo-input-field" placeholder="添加新任务..." style="margin-bottom:0;" autocomplete="off">
+                <button class="buy-btn" onclick="confirmTodo()">添加</button>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeTodoModal()">关闭</button>
             </div>
         </div>
     </div>
@@ -453,18 +423,6 @@
                 </div>
             </div>
             <div class="receipt-footer"><button class="receipt-btn" onclick="closeHistory()">收起</button></div>
-        </div>
-    </div>
-
-    <!-- 弹窗：待办 -->
-    <div id="modal-todo" class="modal-overlay">
-        <div class="input-modal">
-            <h3>新增待办</h3>
-            <input type="text" class="input-field" id="todo-input-field" placeholder="写点什么..." autocomplete="off">
-            <div class="modal-actions">
-                <button class="modal-btn cancel" onclick="closeTodoModal()">取消</button>
-                <button class="modal-btn confirm" onclick="confirmTodo()">确认</button>
-            </div>
         </div>
     </div>
 
@@ -556,8 +514,8 @@
             focusBtn: document.getElementById('focus-btn'),
             customInput: document.getElementById('custom-minutes'),
             timeSetterBox: document.getElementById('time-setter-box'),
-            // New Focus Tag UI
-            currentFocusTagSpan: document.getElementById('current-focus-tag'),
+            // Focus Tag UI
+            focusTagLabel: document.getElementById('focus-tag-label'),
             modalTags: document.getElementById('modal-tags'),
             tagsList: document.getElementById('tags-list'),
             newTagInput: document.getElementById('new-tag-input'),
@@ -664,11 +622,12 @@
             coins: 0,
             inventory: { fishFood: 0 },
             ownedFish: [],
-            periodLogs: [], // { startDate: timestamp, endDate: timestamp }
+            periodLogs: [],
             diaryEntries: [],
-            focusHistory: [], // { timestamp: number, duration: number, tag: string }
+            focusHistory: [],
             isDayMode: false,
-            tags: ["阅读", "代码", "写作", "设计", "发呆"] // Default tags
+            tags: ["阅读", "代码", "写作", "设计", "发呆"],
+            todoList: [] // {id, text, completed}
         };
 
         // --- 初始化与加载 ---
@@ -689,7 +648,6 @@
             startBartenderAI();
             updateCoinUI();
             
-            // 防切屏检测
             document.addEventListener("visibilitychange", () => {
                 if (document.hidden && state.isFocusing) {
                     addMessage("Cipher 皱了皱眉：“你刚才去哪了？时钟可是不会等人的。”", "bartender");
@@ -697,7 +655,6 @@
             });
         };
         
-        // 主题切换
         function toggleTheme() {
             playerData.isDayMode = !playerData.isDayMode;
             if(playerData.isDayMode) {
@@ -759,6 +716,7 @@
                 if (!playerData.diaryEntries) playerData.diaryEntries = [];
                 if (!playerData.focusHistory) playerData.focusHistory = [];
                 if (!playerData.tags) playerData.tags = ["阅读", "代码", "写作", "设计", "发呆"];
+                if (!playerData.todoList) playerData.todoList = [];
             } else {
                 const oldData = localStorage.getItem('driftwood_data');
                 if (oldData) {
@@ -770,9 +728,9 @@
                     } catch(e) {}
                 }
             }
-            // 仅为了兼容旧数据显示次数，列表现改为动态渲染
+            // 仅为了兼容旧数据显示次数
             const count = localStorage.getItem('driftwood_count');
-            if (count) { state.completedCount = parseInt(count); ui.totalSessions.innerText = `累计专注: ${state.completedCount} 次`; }
+            if (count) state.completedCount = parseInt(count);
         }
 
         function exportDataFile() {
@@ -799,9 +757,9 @@
                         if (!playerData.diaryEntries) playerData.diaryEntries = [];
                         if (!playerData.focusHistory) playerData.focusHistory = [];
                         if (!playerData.tags) playerData.tags = ["阅读", "代码", "写作"];
+                        if (!playerData.todoList) playerData.todoList = [];
                         
                         state.completedCount = data.count || 0;
-                        ui.totalSessions.innerText = `累计专注: ${state.completedCount} 次`;
                         saveData(); alert("存档导入成功！页面将自动刷新。"); location.reload();
                     } else throw new Error("结构不完整");
                 } catch (err) { alert("错误：文件已损坏或格式不正确。"); }
@@ -809,7 +767,7 @@
             reader.readAsText(file); input.value = '';
         }
 
-        // --- 专注标签系统 (New) ---
+        // --- 专注标签系统 (按钮式) ---
         function openTagModal() {
             ui.modalTags.classList.add('open');
             renderTags();
@@ -848,7 +806,10 @@
         function deleteTag(tag) {
             if(confirm(`删除标签 "${tag}"?`)) {
                 playerData.tags = playerData.tags.filter(t => t !== tag);
-                if(state.currentFocusTag === tag) state.currentFocusTag = "默认";
+                if(state.currentFocusTag === tag) {
+                    state.currentFocusTag = "默认";
+                    ui.focusTagLabel.innerText = "默认";
+                }
                 saveData();
                 renderTags();
             }
@@ -856,11 +817,58 @@
         
         function selectTag(tag) {
             state.currentFocusTag = tag;
-            ui.currentFocusTagSpan.innerText = `🏷️ ${tag}`;
+            ui.focusTagLabel.innerText = tag;
             closeTagModal();
         }
 
-        // --- 专注逻辑 (增强版) ---
+        // --- 待办清单系统 (弹窗化) ---
+        function openTodoModal() { 
+            ui.modalTodo.classList.add('open'); 
+            renderTodoList();
+            setTimeout(()=>ui.todoInput.focus(),100); 
+        }
+        function closeTodoModal() { ui.modalTodo.classList.remove('open'); ui.todoInput.value = ''; }
+        
+        function renderTodoList() {
+            ui.todoList.innerHTML = '';
+            if(playerData.todoList.length === 0) {
+                ui.todoList.innerHTML = '<li style="text-align:center; color:#888; padding:10px;">暂无待办事项</li>';
+                return;
+            }
+            playerData.todoList.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = `todo-item ${item.completed ? 'completed' : ''}`;
+                li.innerHTML = `
+                    <input type="checkbox" ${item.completed ? 'checked' : ''} onclick="toggleTodo(${index})">
+                    <span>${item.text}</span>
+                    <button class="todo-del" onclick="deleteTodo(${index})">×</button>
+                `;
+                ui.todoList.appendChild(li);
+            });
+        }
+
+        function confirmTodo() {
+            const val = ui.todoInput.value.trim();
+            if(!val) return;
+            playerData.todoList.push({ text: val, completed: false });
+            ui.todoInput.value = '';
+            saveData();
+            renderTodoList();
+        }
+
+        function toggleTodo(index) {
+            playerData.todoList[index].completed = !playerData.todoList[index].completed;
+            saveData();
+            renderTodoList();
+        }
+
+        function deleteTodo(index) {
+            playerData.todoList.splice(index, 1);
+            saveData();
+            renderTodoList();
+        }
+
+        // --- 专注逻辑 ---
         function toggleFocus() { state.isFocusing ? stopFocus() : startFocus(); }
         function startFocus() {
             let m = parseInt(ui.customInput.value) || 25;
@@ -892,9 +900,6 @@
             ui.statusText.innerText = "Cipher 递给您温水...";
             
             const durationMins = state.initialTime/60;
-            const now=new Date();
-            
-            // 保存历史
             const historyItem = { timestamp: Date.now(), duration: durationMins, tag: state.currentFocusTag };
             if(!playerData.focusHistory) playerData.focusHistory = [];
             playerData.focusHistory.push(historyItem);
@@ -909,7 +914,7 @@
         }
         function updateCoinUI() { ui.coinCount.innerText=playerData.coins; ui.storeCoinCount.innerText=playerData.coins; }
 
-        // --- 账单 & 统计逻辑 (重构：日期分组) ---
+        // --- 账单 & 统计逻辑 ---
         function openHistory() { 
             ui.modalBill.classList.add('open'); 
             renderHistoryList();
@@ -924,7 +929,6 @@
                 return;
             }
 
-            // 倒序排列
             const sorted = playerData.focusHistory.slice().sort((a, b) => b.timestamp - a.timestamp);
             let lastDateStr = '';
 
@@ -933,7 +937,6 @@
                 const dateStr = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2,'0')}-${date.getDate().toString().padStart(2,'0')}`;
                 const timeStr = date.toLocaleTimeString('zh-CN', {hour:'2-digit', minute:'2-digit'});
 
-                // 日期分组头
                 if (dateStr !== lastDateStr) {
                     const header = document.createElement('div');
                     header.className = 'history-date-header';
@@ -942,7 +945,6 @@
                     lastDateStr = dateStr;
                 }
 
-                // 记录项
                 const li = document.createElement('li');
                 li.className = 'history-item';
                 li.innerHTML = `<span>${timeStr} [${item.tag || '默认'}]</span> <span>${item.duration}分钟</span>`;
@@ -951,7 +953,6 @@
         }
 
         function renderPieChart() {
-            // 简单统计今日数据
             if(!playerData.focusHistory || playerData.focusHistory.length === 0) {
                 ui.pieChart.style.display = 'none';
                 ui.chartLegend.innerHTML = '暂无今日数据';
@@ -1019,301 +1020,6 @@
                 colorIdx++;
             }
         }
-
-        // --- 心情日记 ---
-        function openDiary() { ui.modalDiary.classList.add('open'); showDiaryList(); }
-        function closeDiary() { ui.modalDiary.classList.remove('open'); }
-        function showDiaryList() {
-            ui.diaryListView.style.display = 'block'; ui.diaryEditorView.style.display = 'none';
-            ui.newDiaryBtn.style.display = 'block'; ui.backDiaryBtn.style.display = 'none';
-            ui.diaryListView.innerHTML = '';
-            const entries = playerData.diaryEntries.sort((a,b) => b.id - a.id);
-            if (entries.length === 0) ui.diaryListView.innerHTML = '<li style="padding:20px; text-align:center; color:#8c7b70; font-style:italic;">纸页空白，等待落笔。</li>';
-            else entries.forEach(entry => {
-                const li = document.createElement('li'); li.className = 'diary-entry-item';
-                li.innerHTML = `<div class="diary-date">${entry.dateStr}</div><div class="diary-preview">${entry.text.substring(0, 20)}${entry.text.length>20?'...':''}</div>`;
-                li.onclick = () => showDiaryEditor(entry.id); ui.diaryListView.appendChild(li);
-            });
-        }
-        function showDiaryEditor(id = null) {
-            ui.diaryListView.style.display = 'none'; ui.diaryEditorView.style.display = 'flex';
-            ui.newDiaryBtn.style.display = 'none'; ui.backDiaryBtn.style.display = 'block';
-            state.currentDiaryId = id;
-            if (id) { const entry = playerData.diaryEntries.find(e => e.id === id); ui.diaryText.value = entry ? entry.text : ''; }
-            else { ui.diaryText.value = ''; }
-            ui.diaryText.focus();
-        }
-        function saveDiaryEntry() {
-            const text = ui.diaryText.value.trim(); if (!text) { alert("内容为空。"); return; }
-            if (state.currentDiaryId) { const entry = playerData.diaryEntries.find(e => e.id === state.currentDiaryId); if (entry) entry.text = text; }
-            else { const now = new Date(); const dateStr = now.toLocaleString('zh-CN', {month:'long', day:'numeric', hour:'2-digit', minute:'2-digit'}); playerData.diaryEntries.push({ id: Date.now(), dateStr: dateStr, text: text }); }
-            saveData(); showDiaryList();
-        }
-        function deleteCurrentEntry() {
-            if (!state.currentDiaryId) { showDiaryList(); return; }
-            if (confirm("确定要撕掉这一页吗？")) { playerData.diaryEntries = playerData.diaryEntries.filter(e => e.id !== state.currentDiaryId); saveData(); showDiaryList(); }
-        }
-
-        // --- 生理期系统 ---
-        function openPeriodModal() { 
-            ui.modalPeriod.classList.add('open'); 
-            renderPeriodCalendar(); 
-            updatePeriodStatus(); 
-            renderPeriodHistory(); 
-        }
-        function closePeriodModal() { ui.modalPeriod.classList.remove('open'); }
-        function isPeriodActive() {
-            if (playerData.periodLogs.length === 0) return false;
-            const lastLog = playerData.periodLogs[playerData.periodLogs.length - 1];
-            if (!lastLog.endDate) {
-                const diff = (Date.now() - lastLog.startDate) / (1000 * 60 * 60 * 24);
-                return diff < 10;
-            }
-            return false;
-        }
-        function logPeriodStart() {
-            if (isPeriodActive()) return alert("你已经记录了本次生理期开始。");
-            playerData.periodLogs.push({ startDate: Date.now(), endDate: null });
-            playerData.periodLogs.sort((a,b) => a.startDate - b.startDate);
-            saveData(); renderPeriodCalendar(); updatePeriodStatus(); renderPeriodHistory();
-            addMessage("Cipher 默默调高了室内的空调温度。", "event");
-        }
-        function logPeriodEnd() {
-            if (!isPeriodActive()) return alert("当前没有进行中的生理期记录。");
-            const lastLog = playerData.periodLogs[playerData.periodLogs.length - 1];
-            lastLog.endDate = Date.now();
-            saveData(); renderPeriodCalendar(); updatePeriodStatus(); renderPeriodHistory();
-            addMessage("身体恢复了吗？真是太好了。", "bartender");
-        }
-        function getCycleStats() {
-            if (playerData.periodLogs.length < 2) return { avgCycle: 28 };
-            let totalCycle = 0; let cycleCount = 0;
-            for(let i = playerData.periodLogs.length - 1; i > 0 && cycleCount < 6; i--) {
-                const current = playerData.periodLogs[i].startDate;
-                const prev = playerData.periodLogs[i-1].startDate;
-                totalCycle += (current - prev);
-                cycleCount++;
-            }
-            const avgCycleDays = cycleCount > 0 ? Math.round(totalCycle / cycleCount / (86400000)) : 28;
-            return { avgCycle: avgCycleDays };
-        }
-        function predictNextPeriod() {
-            if (playerData.periodLogs.length === 0) return null;
-            const lastLog = playerData.periodLogs[playerData.periodLogs.length - 1];
-            const lastStart = lastLog.startDate;
-            const { avgCycle } = getCycleStats();
-            return lastStart + (avgCycle * 24 * 60 * 60 * 1000);
-        }
-        function updatePeriodStatus() {
-            const lastLog = playerData.periodLogs[playerData.periodLogs.length - 1];
-            if (isPeriodActive()) {
-                const days = Math.floor((Date.now() - lastLog.startDate) / (86400000)) + 1;
-                ui.periodStatus.innerText = `生理期进行中 (第 ${days} 天)`; 
-                ui.periodStatus.style.color = "#ff6b81";
-            } else {
-                const nextDateTs = predictNextPeriod();
-                if (nextDateTs) {
-                    const nextDate = new Date(nextDateTs);
-                    const daysLeft = Math.ceil((nextDateTs - Date.now()) / (86400000));
-                    const dateStr = `${nextDate.getMonth()+1}月${nextDate.getDate()}日`;
-                    if(daysLeft < 0) ui.periodStatus.innerText = `推迟了 ${Math.abs(daysLeft)} 天 (预测: ${dateStr})`;
-                    else ui.periodStatus.innerText = `预测: ${dateStr} 来访 (还有 ${daysLeft} 天)`;
-                    ui.periodStatus.style.color = "#ffb8c1";
-                } else { ui.periodStatus.innerText = "暂无足够记录预测"; }
-            }
-        }
-        function renderPeriodCalendar() {
-            const container = ui.calDaysContainer; container.innerHTML = '';
-            const now = new Date();
-            ui.calMonthLabel.innerText = `${now.getFullYear()}年 ${now.getMonth() + 1}月`;
-            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-            for (let i = 0; i < firstDay.getDay(); i++) container.appendChild(document.createElement('div'));
-            
-            const predictedTs = predictNextPeriod();
-            let ovulationTs = null;
-            if(predictedTs) ovulationTs = predictedTs - (14 * 86400000);
-
-            for (let d = 1; d <= lastDay.getDate(); d++) {
-                const div = document.createElement('div'); div.className = 'calendar-day'; div.innerText = d;
-                const currentTs = new Date(now.getFullYear(), now.getMonth(), d).getTime();
-                let isPeriod = false;
-                playerData.periodLogs.forEach(log => {
-                    const start = new Date(log.startDate).setHours(0,0,0,0);
-                    const end = log.endDate ? new Date(log.endDate).setHours(23,59,59,999) : (isPeriodActive() ? Date.now() : start);
-                    if (currentTs >= start && currentTs <= end) isPeriod = true;
-                });
-                if (isPeriod) div.classList.add('active-period');
-                if (d === now.getDate()) div.classList.add('today');
-                if (predictedTs && !isPeriod) {
-                    const pStart = new Date(predictedTs).setHours(0,0,0,0);
-                    const pEnd = pStart + (4 * 86400000);
-                    if (currentTs >= pStart && currentTs <= pEnd) div.classList.add('predicted');
-                }
-                if (ovulationTs && !isPeriod) {
-                    const oStart = new Date(ovulationTs).setHours(0,0,0,0);
-                    if (Math.abs(currentTs - oStart) < 86400000 / 2) div.classList.add('ovulation');
-                    else if (Math.abs(currentTs - oStart) <= 2 * 86400000) div.classList.add('fertile');
-                }
-                container.appendChild(div);
-            }
-        }
-        function renderPeriodHistory() {
-            ui.periodHistoryList.innerHTML = '';
-            playerData.periodLogs.slice().reverse().forEach((log, index) => {
-                const realIndex = playerData.periodLogs.length - 1 - index;
-                const s = new Date(log.startDate).toLocaleDateString();
-                const e = log.endDate ? new Date(log.endDate).toLocaleDateString() : '进行中...';
-                const div = document.createElement('div');
-                div.className = 'period-history-item';
-                div.innerHTML = `<span>${s} - ${e}</span> <span class="period-del-btn" onclick="deletePeriodLog(${realIndex})">×</span>`;
-                ui.periodHistoryList.appendChild(div);
-            });
-        }
-        function deletePeriodLog(index) {
-            if(confirm("确定删除这条记录吗？")) {
-                playerData.periodLogs.splice(index, 1);
-                saveData(); renderPeriodCalendar(); updatePeriodStatus(); renderPeriodHistory();
-            }
-        }
-        function retroAddPeriodStart() {
-            const val = ui.periodAddDate.value;
-            if(!val) return alert("请选择日期");
-            const ts = new Date(val).getTime();
-            if(isPeriodActive()) return alert("请先结束当前的记录");
-            playerData.periodLogs.push({ startDate: ts, endDate: null });
-            playerData.periodLogs.sort((a,b) => a.startDate - b.startDate);
-            saveData(); renderPeriodCalendar(); updatePeriodStatus(); renderPeriodHistory();
-            alert("补录开始日期成功");
-        }
-        function retroAddPeriodEnd() {
-            const val = ui.periodAddDate.value;
-            if(!val) return alert("请选择日期");
-            const ts = new Date(val).getTime();
-            const openLog = playerData.periodLogs.find(l => !l.endDate);
-            if(!openLog) return alert("没有进行中的记录可结束");
-            if(ts < openLog.startDate) return alert("结束日期不能早于开始日期");
-            openLog.endDate = ts;
-            saveData(); renderPeriodCalendar(); updatePeriodStatus(); renderPeriodHistory();
-            alert("补录结束日期成功");
-        }
-
-        // --- 商店 & 宠物 ---
-        function openStore() { ui.modalStore.classList.add('open'); renderShopItems(); renderAquarium(); }
-        function closeStore() { ui.modalStore.classList.remove('open'); }
-        function switchStoreTab(tab) {
-            document.querySelectorAll('.store-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            ui.tabShop.style.display = tab === 'shop' ? 'grid' : 'none';
-            ui.tabPet.style.display = tab === 'pet' ? 'block' : 'none';
-            if(tab === 'pet') renderAquarium();
-        }
-        function renderShopItems() {
-            ui.tabShop.innerHTML = '';
-            createShopItem('fish_food', '特制鱼粮', '恢复30饱食度', 2, () => buyFood());
-            Object.keys(FISH_TYPES).forEach(key => createShopItem(key, FISH_TYPES[key].name, FISH_TYPES[key].desc, FISH_TYPES[key].price, () => buyFish(key)));
-            SPECIAL_DRINKS.forEach(drink => createShopItem(drink.id, drink.name, drink.desc, drink.price, () => buyDrink(drink), false, true));
-        }
-        function createShopItem(id, name, desc, price, action, isSold=false, isDrink=false) {
-            const el = document.createElement('div'); el.className = `store-item ${isDrink?'drink-item':''}`;
-            el.innerHTML = `<div class="item-info"><span class="item-name">${isDrink?'🍸 ':''}${name}</span><span class="item-desc">${desc}</span></div><button class="buy-btn">${price} G</button>`;
-            el.querySelector('.buy-btn').onclick = action; ui.tabShop.appendChild(el);
-        }
-        function buyFood() {
-            if (playerData.coins >= 2) { playerData.coins -= 2; playerData.inventory.fishFood++; updateCoinUI(); addMessage("购买了鱼粮。", "event"); saveData(); renderShopItems(); } else alert("金币不足");
-        }
-        function buyFish(type, isFree=false) {
-            const fish = FISH_TYPES[type];
-            if (isFree || playerData.coins >= fish.price) {
-                if(!isFree) playerData.coins -= fish.price;
-                playerData.ownedFish.push({ id: Date.now(), type: type, hunger: 80, happy: 80 });
-                updateCoinUI(); addMessage(`你带回了「${fish.name}」。`, "event"); saveData(); renderShopItems();
-            } else alert("金币不足");
-        }
-        function buyDrink(drink) {
-            if (isPeriodActive() && (drink.id === 'drink_mute' || drink.id === 'drink_old')) {
-                addMessage("（Cipher 挡住了酒单）“这两天还是不要喝冰的和烈酒比较好。”", "bartender");
-                setTimeout(() => addMessage("“我会为你准备一杯热红糖姜茶，这杯算我请的。”", "bartender"), 1500);
-                return;
-            }
-            if (playerData.coins >= drink.price) {
-                playerData.coins -= drink.price; updateCoinUI(); closeStore();
-                addMessage(`点了一杯「${drink.name}」。`, "user");
-                setTimeout(() => addMessage(`（递上酒杯）“${drink.quote}”`, "bartender"), 1000);
-                saveData();
-            } else alert("金币不足");
-        }
-        function renderAquarium() {
-            ui.petListContainer.innerHTML = ''; ui.foodCount.innerText = playerData.inventory.fishFood;
-            if (playerData.ownedFish.length === 0) { ui.petEmptyMsg.style.display = 'block'; return; }
-            ui.petEmptyMsg.style.display = 'none';
-            playerData.ownedFish.forEach(fish => {
-                const config = FISH_TYPES[fish.type];
-                const card = document.createElement('div'); card.className = 'pet-card';
-                card.innerHTML = `<div class="pet-icon">${config.icon}</div><div class="pet-stats"><div class="pet-name">${config.name}</div><div class="stat-row"><span>饱食</span><div class="progress-bg"><div class="progress-fill" style="width:${fish.hunger}%; background:${getColor(fish.hunger)}"></div></div></div><div class="stat-row"><span>心情</span><div class="progress-bg"><div class="progress-fill" style="width:${fish.happy}%; background:${getColor(fish.happy)}"></div></div></div></div><button class="feed-btn-small" onclick="feedFish(${fish.id})">喂食</button>`;
-                ui.petListContainer.appendChild(card);
-            });
-        }
-        function getColor(v) { return v<30?'#ff4d4d':v<70?'#ffdb4d':'#4cd964'; }
-        function feedFish(id) {
-            if(playerData.inventory.fishFood<=0) return alert("没有鱼粮了。");
-            const f = playerData.ownedFish.find(x=>x.id===id);
-            if(f){ f.hunger=Math.min(100,f.hunger+30); f.happy=Math.min(100,f.happy+10); playerData.inventory.fishFood--; saveData(); renderAquarium(); }
-        }
-        function updatePetStatsLoop() {
-            if(playerData.ownedFish.length>0 && new Date().getSeconds()===0) {
-                playerData.ownedFish.forEach(f=>{ if(f.hunger>0)f.hunger--; if(f.happy>0)f.happy--; });
-                if(ui.modalStore.classList.contains('open')) renderAquarium();
-                saveData();
-            }
-        }
-
-        // --- 专注逻辑 ---
-        function toggleFocus() { state.isFocusing ? stopFocus() : startFocus(); }
-        function startFocus() {
-            let m = parseInt(ui.customInput.value) || 25;
-            state.timeLeft = m * 60; state.initialTime = state.timeLeft; state.elapsedFocusTime = 0; state.isFocusing = true;
-            state.currentFocusTag = ui.currentFocusTagSpan.innerText.replace('🏷️ ', '').split(' (')[0] || "默认";
-            
-            ui.focusBtn.innerText = "停止专注"; ui.focusBtn.classList.add('active-state'); ui.timeSetterBox.style.display = 'none';
-            
-            ui.statusText.innerText = "Cipher 将沙漏倒置...";
-            initAudioContext(); ui.bgm.play().catch(e=>{});
-            addMessage(`明白了，${m}分钟 (${state.currentFocusTag})。`, "bartender");
-            
-            state.timerId = setInterval(() => {
-                state.timeLeft--; state.elapsedFocusTime++;
-                let min = Math.floor(state.timeLeft/60), sec = state.timeLeft%60;
-                ui.timerDisplay.innerText = `${min.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}`;
-                
-                // 1分钟1金币
-                if (state.elapsedFocusTime>0 && state.elapsedFocusTime%60===0) {
-                    playerData.coins++; updateCoinUI(); triggerAlert("获得专注奖励：1 金币", false);
-                    ui.coinCount.classList.add('coin-anim'); setTimeout(()=>ui.coinCount.classList.remove('coin-anim'),300); saveData();
-                }
-                if (state.timeLeft<=0) finishFocus();
-            }, 1000);
-        }
-        function stopFocus() { clearInterval(state.timerId); state.isFocusing=false; resetUI(); addMessage("休息一下也好。", "bartender"); ui.bgm.pause(); }
-        function finishFocus() {
-            clearInterval(state.timerId); state.isFocusing=false; resetUI();
-            triggerAlert("时间到了。辛苦了。", true);
-            ui.statusText.innerText = "Cipher 递给您温水...";
-            
-            const durationMins = state.initialTime/60;
-            const historyItem = { timestamp: Date.now(), duration: durationMins, tag: state.currentFocusTag };
-            if(!playerData.focusHistory) playerData.focusHistory = [];
-            playerData.focusHistory.push(historyItem);
-            
-            state.completedCount++; ui.totalSessions.innerText=`累计专注: ${state.completedCount} 次`;
-            ui.bgm.pause(); saveData();
-        }
-        function resetUI() { 
-            ui.focusBtn.innerText="开始专注"; 
-            ui.focusBtn.classList.remove('active-state'); 
-            ui.timeSetterBox.style.display='flex';
-        }
-        function updateCoinUI() { ui.coinCount.innerText=playerData.coins; ui.storeCoinCount.innerText=playerData.coins; }
 
         // --- 对话 & 饮品 ---
         function chatWithBartender() {
@@ -1407,16 +1113,11 @@
         
         // 模态框通用关闭
         [ui.modalBill, ui.modalTodo, ui.modalStore, ui.modalPeriod, ui.modalDiary, ui.modalTags].forEach(m => { m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('open'); }); });
-        function confirmTodo() {
-            const val = ui.todoInput.value.trim(); if(!val) { closeTodoModal(); return; }
-            const li = document.createElement('li'); li.className = 'list-item';
-            li.innerHTML = `<input type="checkbox" onclick="this.parentElement.classList.toggle('completed')"><span>${val}</span><button class="del-btn" onclick="this.parentElement.remove()">×</button>`;
-            ui.todoList.appendChild(li); closeTodoModal();
-        }
+        
+        // Input Keypress
         ui.todoInput.addEventListener('keypress', (e)=>{ if(e.key==='Enter') confirmTodo(); });
-        function openTodoModal() { ui.modalTodo.classList.add('open'); setTimeout(()=>ui.todoInput.focus(),100); }
-        function closeTodoModal() { ui.modalTodo.classList.remove('open'); ui.todoInput.value = ''; }
+        ui.newTagInput.addEventListener('keypress', (e)=>{ if(e.key==='Enter') addNewTag(); });
 
     </script>
 </body>
-    </html>
+</html>
