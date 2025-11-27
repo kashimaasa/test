@@ -318,24 +318,49 @@
 
         /* 生理期日历 */
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: var(--text-dim); }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 15px; font-size: 0.85em; }
+        .calendar-nav-btn { background: transparent; border: 1px solid var(--glass-border); color: var(--text-dim); border-radius: 4px; padding: 2px 8px; cursor: pointer; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 15px; font-size: 0.85em; }
         .calendar-day-label { text-align: center; color: var(--text-dim); font-size: 0.75em; padding-bottom: 5px; }
-        .calendar-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 4px; background: rgba(255,255,255,0.05); color: var(--text-dim); position: relative; }
-        .calendar-day.today { border: 1px solid var(--text-main); color: var(--text-main); }
-        .calendar-day.active-period { background: rgba(255, 107, 129, 0.4); color: var(--text-main); }
-        .calendar-day.predicted { border: 1px dashed var(--period-color); color: var(--period-predict); }
-        .calendar-day.ovulation { border: 1px solid var(--ovulation-color); color: var(--ovulation-color); font-weight: bold; }
-        .calendar-day.fertile { background: rgba(162, 155, 254, 0.15); }
-        .period-controls { display: flex; gap: 10px; margin-top: 15px; }
-        .period-btn-action { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; color: #fff; opacity: 0.9; }
-        .btn-start-period { background: var(--period-color); }
-        .btn-end-period { background: #333; border: 1px solid #555; }
-        .period-status-text { font-size: 0.9em; color: var(--period-predict); margin-bottom: 10px; min-height: 1.2em;}
-        .period-history-list { max-height: 100px; overflow-y: auto; text-align: left; font-size: 0.85em; border-top: 1px solid #444; margin-top: 15px; padding-top: 10px;}
-        .period-history-item { display: flex; justify-content: space-between; padding: 4px 0; color: #aaa; }
-        .period-del-btn { color: #d9534f; cursor: pointer; margin-left: 10px;}
-        .period-add-row { display: flex; gap: 5px; margin-top: 10px; align-items: center; font-size: 0.8em; color: #888;}
+        
+        .calendar-day { 
+            aspect-ratio: 1; display: flex; align-items: center; justify-content: center; 
+            border-radius: 50%; /* 改为圆形更柔和 */
+            background: rgba(255,255,255,0.02); color: var(--text-dim); position: relative; cursor: pointer;
+            transition: all 0.2s;
+            font-family: tabular-nums;
+        }
+        .calendar-day:active { transform: scale(0.9); }
+        .calendar-day.today { border: 1px solid var(--text-main); font-weight: bold; }
+        .calendar-day.selected { box-shadow: 0 0 0 2px var(--accent-color); z-index: 2; color: #fff; background: rgba(212, 175, 55, 0.2); }
+        
+        /* 状态样式 */
+        .calendar-day.active-period { background: var(--period-color); color: #000; font-weight: bold; box-shadow: 0 0 5px var(--period-color); }
+        .calendar-day.active-period.start { border-radius: 50% 0 0 50%; margin-right: -3px; z-index: 1;} /* 连体效果左 */
+        .calendar-day.active-period.end { border-radius: 0 50% 50% 0; margin-left: -3px; z-index: 1;}   /* 连体效果右 */
+        .calendar-day.active-period.middle { border-radius: 0; margin: 0 -3px; z-index: 0;}             /* 连体效果中 */
 
+        /* 预测样式 */
+        .calendar-day.predicted { border: 1px dashed var(--period-color); color: var(--period-predict); opacity: 0.8; }
+        
+        /* 排卵期样式 */
+        .calendar-day.ovulation { border: 2px solid var(--ovulation-color); color: var(--ovulation-color); font-weight: bold; }
+        .calendar-day.fertile { background: rgba(162, 155, 254, 0.15); color: #ccc; }
+
+        /* 操作区域 */
+        .period-info-panel { text-align: left; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-bottom: 15px; font-size: 0.85em; color: #aaa; line-height: 1.6; }
+        .period-info-highlight { color: var(--period-predict); font-weight: bold; }
+        
+        .period-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .period-btn-action { padding: 10px 0; border-radius: 6px; border: 1px solid #444; background: rgba(255,255,255,0.05); color: #ccc; cursor: pointer; font-size: 0.85em; transition: 0.2s; }
+        .period-btn-action:hover { background: rgba(255,255,255,0.1); }
+        .period-btn-action.btn-start { border-color: var(--period-color); color: var(--period-color); }
+        .period-btn-action.btn-end { border-color: #555; color: #fff; }
+        .period-btn-action.btn-clear { border-color: #d9534f; color: #d9534f; }
+        
+        /* 图例 */
+        .period-legend { display: flex; justify-content: center; gap: 15px; font-size: 0.7em; color: #666; margin-top: 10px; flex-wrap: wrap;}
+        .legend-dot { width: 8px; height: 8px; display: inline-block; border-radius: 50%; margin-right: 4px; }
+        
         /* 日记本 */
         .diary-modal-content {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -530,28 +555,56 @@
     <!-- 弹窗：生理期 -->
     <div id="modal-period" class="modal-overlay">
         <div class="input-modal">
-            <h3><span>周期记录</span><span style="font-size:0.7em; color:var(--period-color)">🌺</span></h3>
-            <div class="period-status-text" id="period-status">加载中...</div>
-            <div class="calendar-header"><span id="cal-month-label">Month</span></div>
-            <div class="calendar-grid" style="margin-bottom:0">
+            <h3>
+                <span>周期记录</span>
+                <span style="font-size:0.7em; color:var(--period-color)">🌺</span>
+            </h3>
+            
+            <!-- 预测信息面板 -->
+            <div class="period-info-panel">
+                <div id="period-status-text">状态: ...</div>
+                <div id="period-prediction-text">预测: ...</div>
+            </div>
+
+            <!-- 日历控制 -->
+            <div class="calendar-header">
+                <button class="calendar-nav-btn" onclick="changePeriodMonth(-1)">◀</button>
+                <span id="cal-month-label" style="font-weight:bold; color:var(--text-main)">Month</span>
+                <button class="calendar-nav-btn" onclick="changePeriodMonth(1)">▶</button>
+            </div>
+
+            <!-- 日历网格 -->
+            <div class="calendar-grid" style="margin-bottom:5px">
                 <div class="calendar-day-label">日</div><div class="calendar-day-label">一</div>
                 <div class="calendar-day-label">二</div><div class="calendar-day-label">三</div>
                 <div class="calendar-day-label">四</div><div class="calendar-day-label">五</div>
                 <div class="calendar-day-label">六</div>
             </div>
             <div id="calendar-days-container" class="calendar-grid"></div>
-            <div class="period-controls">
-                <button class="period-btn-action btn-start-period" onclick="logPeriodStart()">姨妈来了</button>
-                <button class="period-btn-action btn-end-period" onclick="logPeriodEnd()">姨妈走了</button>
+
+            <!-- 选中日期操作区 -->
+            <div style="border-top: 1px solid #444; padding-top: 10px; margin-top: 5px;">
+                <div style="font-size: 0.8em; color: #888; margin-bottom: 5px;">
+                    选中: <span id="selected-date-label" style="color: var(--accent-color)">今天</span>
+                </div>
+                <div class="period-controls">
+                    <button class="period-btn-action btn-start" onclick="setPeriodAction('start')">设为开始</button>
+                    <button class="period-btn-action btn-end" onclick="setPeriodAction('end')">设为结束</button>
+                    <button class="period-btn-action btn-clear" onclick="setPeriodAction('clear')">清除状态</button>
+                </div>
             </div>
-            <div class="period-history-list" id="period-history-list"></div>
-            <div class="period-add-row">
-                <span>补录:</span>
-                <input type="date" id="period-add-date" style="background:#333; color:#fff; border:none; border-radius:4px;">
-                <button class="data-btn" onclick="retroAddPeriodStart()">始</button>
-                <button class="data-btn" onclick="retroAddPeriodEnd()">终</button>
+
+            <!-- 图例 -->
+            <div class="period-legend">
+                <span><span class="legend-dot" style="background:var(--period-color)"></span>经期</span>
+                <span><span class="legend-dot" style="border:1px dashed var(--period-color)"></span>预测</span>
+                <span><span class="legend-dot" style="background:var(--ovulation-color)"></span>排卵日</span>
+                <span><span class="legend-dot" style="background:rgba(162, 155, 254, 0.3)"></span>易孕</span>
             </div>
-            <div class="modal-actions"><button class="modal-btn cancel" onclick="closePeriodModal()">关闭</button></div>
+
+            <div class="modal-actions" style="margin-top: 15px;">
+                <button class="modal-btn cancel" onclick="closePeriodModal()">关闭</button>
+            </div>
         </div>
     </div>
 
@@ -1286,38 +1339,248 @@
         }
         function deleteCurrentEntry() { if(state.currentDiaryId && confirm("删除此日记?")) { playerData.diaryEntries = playerData.diaryEntries.filter(x=>x.id!==state.currentDiaryId); saveData(); showDiaryList(); showToast("已删除"); } }
 
-        // 生理期
-        function openPeriodModal() { ui.modalPeriod.classList.add('open'); renderPeriodCalendar(); updatePeriodStatus(); renderPeriodHistory(); }
+        // --- 生理期系统 ---
+        
+        function openPeriodModal() {
+            state.calendarOffset = 0; // 重置回当月
+            state.selectedDateObj = new Date(); // 默认选中今天
+            state.selectedDateObj.setHours(0,0,0,0);
+            
+            ui.modalPeriod.classList.add('open');
+            renderPeriodCalendar();
+            updatePeriodInfoPanel();
+        }
+
         function closePeriodModal() { ui.modalPeriod.classList.remove('open'); }
-        function isPeriodActive() { return playerData.periodLogs.length && playerData.periodLogs[playerData.periodLogs.length-1].endDate === null; }
-        function updatePeriodStatus() { ui.periodStatus.innerText = isPeriodActive() ? "当前处于生理期中" : "当前未在生理期"; ui.periodStatus.style.color = isPeriodActive() ? "var(--period-color)" : "var(--text-dim)"; }
+
+        function changePeriodMonth(offset) {
+            state.calendarOffset += offset;
+            renderPeriodCalendar();
+        }
+
+        // 核心：渲染日历
         function renderPeriodCalendar() {
-            const now = new Date(); ui.calMonthLabel.innerText = `${now.getFullYear()}年${now.getMonth()+1}月`;
+            const now = new Date();
+            // 根据偏移量计算显示的月份
+            const displayDate = new Date(now.getFullYear(), now.getMonth() + state.calendarOffset, 1);
+            const year = displayDate.getFullYear();
+            const month = displayDate.getMonth(); // 0-11
+            
+            document.getElementById('cal-month-label').innerText = `${year}年 ${month + 1}月`;
             ui.calDaysContainer.innerHTML = '';
-            for(let i=0; i<new Date(now.getFullYear(), now.getMonth(), 1).getDay(); i++) ui.calDaysContainer.appendChild(document.createElement('div'));
-            for(let d=1; d<=new Date(now.getFullYear(), now.getMonth()+1, 0).getDate(); d++) {
-                const div = document.createElement('div'); div.className = 'calendar-day'; div.innerText = d;
-                const cd = new Date(now.getFullYear(), now.getMonth(), d);
-                if(d===now.getDate()) div.classList.add('today');
-                playerData.periodLogs.forEach(l => { if(cd >= new Date(l.startDate) && cd <= (l.endDate ? new Date(l.endDate) : new Date())) div.classList.add('active-period'); });
+
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDayIndex = new Date(year, month, 1).getDay(); // 0(Sun) - 6(Sat)
+
+            // 填充空白
+            for(let i=0; i<firstDayIndex; i++) {
+                ui.calDaysContainer.appendChild(document.createElement('div'));
+            }
+
+            // 获取预测数据
+            const predictions = calculatePeriodPrediction();
+
+            // 生成日期格子
+            for(let d=1; d<=daysInMonth; d++) {
+                const dateObj = new Date(year, month, d);
+                const timeStr = dateObj.getTime();
+                
+                const div = document.createElement('div');
+                div.className = 'calendar-day';
+                div.innerText = d;
+                
+                // 1. 标记今天
+                const today = new Date(); today.setHours(0,0,0,0);
+                if(timeStr === today.getTime()) div.classList.add('today');
+
+                // 2. 标记选中
+                if(state.selectedDateObj && timeStr === state.selectedDateObj.getTime()) {
+                    div.classList.add('selected');
+                    // 更新下方标签
+                    document.getElementById('selected-date-label').innerText = `${month+1}月${d}日`;
+                }
+
+                // 3. 标记历史/当前记录 (实心红)
+                let isLog = false;
+                playerData.periodLogs.forEach(l => {
+                    const start = new Date(l.startDate).setHours(0,0,0,0);
+                    const end = l.endDate ? new Date(l.endDate).setHours(0,0,0,0) : (isPeriodOngoing(l) ? today.getTime() : start); 
+                    
+                    if (timeStr >= start && timeStr <= end) {
+                        isLog = true;
+                        div.classList.add('active-period');
+                        // 连体样式处理
+                        if(timeStr === start && timeStr !== end) div.classList.add('start');
+                        else if(timeStr === end && timeStr !== start) div.classList.add('end');
+                        else if(timeStr > start && timeStr < end) div.classList.add('middle');
+                    }
+                });
+
+                // 4. 标记预测 (如果不是实心记录)
+                if (!isLog && predictions) {
+                    // 预测经期
+                    if (timeStr >= predictions.nextStart && timeStr < predictions.nextStart + (5 * 86400000)) {
+                        div.classList.add('predicted');
+                    }
+                    // 排卵日
+                    if (timeStr === predictions.ovulationDate) {
+                        div.classList.add('ovulation');
+                    }
+                    // 易孕期
+                    if (timeStr >= predictions.fertileStart && timeStr <= predictions.fertileEnd) {
+                        div.classList.add('fertile');
+                    }
+                }
+
+                // 点击事件
+                div.onclick = () => {
+                    state.selectedDateObj = new Date(year, month, d);
+                    renderPeriodCalendar(); // 重新渲染以更新选中状态
+                };
+
                 ui.calDaysContainer.appendChild(div);
             }
         }
-        function renderPeriodHistory() {
-            ui.periodHistoryList.innerHTML = '';
-            if(!playerData.periodLogs.length) ui.periodHistoryList.innerHTML = '<div style="text-align:center;color:#888;">暂无记录</div>';
-            playerData.periodLogs.slice().reverse().forEach((l, i) => {
-                const div = document.createElement('div'); div.className = 'period-history-item';
-                div.innerHTML = `<span>${new Date(l.startDate).toLocaleDateString()} ${l.endDate ? '- '+new Date(l.endDate).toLocaleDateString() : '...'}</span><span class="period-del-btn" onclick="deletePeriodLog(${playerData.periodLogs.length-1-i})">×</span>`;
-                ui.periodHistoryList.appendChild(div);
-            });
-        }
-        function logPeriodStart() { if(isPeriodActive()) return showToast("已在记录中"); playerData.periodLogs.push({startDate:Date.now(), endDate:null}); saveData(); openPeriodModal(); showToast("记录开始"); addMessage("多休息，需要红糖水吗？", "bartender"); }
-        function logPeriodEnd() { if(!isPeriodActive()) return showToast("无进行中记录"); playerData.periodLogs[playerData.periodLogs.length-1].endDate=Date.now(); saveData(); openPeriodModal(); showToast("记录结束"); addMessage("身体好些了吗？", "bartender"); }
-        function deletePeriodLog(i) { if(confirm("删除此记录?")) { playerData.periodLogs.splice(i, 1); saveData(); openPeriodModal(); } }
-        function retroAddPeriodStart() { if(!ui.periodAddDate.value) return; playerData.periodLogs.push({startDate:new Date(ui.periodAddDate.value).getTime(), endDate:null}); saveData(); openPeriodModal(); }
-        function retroAddPeriodEnd() { if(!ui.periodAddDate.value || !isPeriodActive()) return; playerData.periodLogs[playerData.periodLogs.length-1].endDate=new Date(ui.periodAddDate.value).getTime(); saveData(); openPeriodModal(); }
 
+        // 判断某条记录是否正在进行中（没有结束日期，且开始时间在合理的过去，比如30天内）
+        function isPeriodOngoing(log) {
+            if (log.endDate) return false;
+            const diff = (Date.now() - log.startDate) / (1000 * 60 * 60 * 24);
+            return diff < 30; 
+        }
+
+        // 计算预测数据
+        function calculatePeriodPrediction() {
+            if (!playerData.periodLogs || playerData.periodLogs.length === 0) return null;
+            
+            // 简单的平均周期算法
+            let cycleDays = 28; // 默认
+            const logs = playerData.periodLogs.slice().sort((a,b) => a.startDate - b.startDate);
+            
+            if (logs.length >= 2) {
+                let sum = 0;
+                for(let i=1; i<logs.length; i++) {
+                    const diff = (logs[i].startDate - logs[i-1].startDate) / (1000 * 3600 * 24);
+                    if(diff > 20 && diff < 40) sum += diff; // 排除异常值
+                    else sum += 28;
+                }
+                cycleDays = sum / (logs.length - 1);
+            }
+
+            const lastStart = logs[logs.length-1].startDate;
+            const nextStart = lastStart + (cycleDays * 24 * 3600 * 1000);
+            
+            // 排卵日通常在下次经期前14天
+            const ovulationDate = nextStart - (14 * 24 * 3600 * 1000);
+            // 易孕期：排卵前5天到后1天
+            const fertileStart = ovulationDate - (5 * 24 * 3600 * 1000);
+            const fertileEnd = ovulationDate + (1 * 24 * 3600 * 1000);
+
+            // 修正时间戳为当天的0点，方便比较
+            const normalize = (ts) => new Date(ts).setHours(0,0,0,0);
+
+            return {
+                nextStart: normalize(nextStart),
+                ovulationDate: normalize(ovulationDate),
+                fertileStart: normalize(fertileStart),
+                fertileEnd: normalize(fertileEnd),
+                cycleLength: Math.round(cycleDays)
+            };
+        }
+
+        function updatePeriodInfoPanel() {
+            const statusDiv = document.getElementById('period-status-text');
+            const predDiv = document.getElementById('period-prediction-text');
+            
+            // 1. 状态
+            const activeLog = playerData.periodLogs.find(l => isPeriodOngoing(l));
+            if (activeLog) {
+                const days = Math.floor((Date.now() - activeLog.startDate) / (1000*3600*24)) + 1;
+                statusDiv.innerHTML = `状态: <span style="color:var(--period-color)">经期第 ${days} 天</span>`;
+            } else {
+                statusDiv.innerHTML = `状态: 当前非经期`;
+            }
+
+            // 2. 预测
+            const pred = calculatePeriodPrediction();
+            if (pred) {
+                const d = new Date(pred.nextStart);
+                const diff = Math.ceil((pred.nextStart - Date.now()) / (1000*3600*24));
+                const text = diff > 0 ? `还有 ${diff} 天` : (diff === 0 ? "预计就在今天" : "可能已推迟");
+                predDiv.innerHTML = `预测: 下次约 <span class="period-info-highlight">${d.getMonth()+1}.${d.getDate()}</span> (${text})<br>平均周期: ${pred.cycleLength} 天`;
+            } else {
+                predDiv.innerHTML = "预测: 记录不足，暂无预测";
+            }
+        }
+
+        // 操作处理
+        function setPeriodAction(action) {
+            if (!state.selectedDateObj) return showToast("请先选择日期");
+            const targetTime = state.selectedDateObj.getTime();
+            
+            // 排序记录
+            playerData.periodLogs.sort((a,b) => a.startDate - b.startDate);
+
+            if (action === 'start') {
+                // 逻辑：如果这一天已经在某个记录里，则忽略或提示。否则创建新记录。
+                // 简化：直接添加一个开始，End为null。
+                // 检查是否冲突
+                const conflict = playerData.periodLogs.find(l => {
+                    const e = l.endDate || Date.now();
+                    return targetTime >= l.startDate && targetTime <= e;
+                });
+                
+                if (conflict) {
+                    showToast("该日期已在记录中");
+                } else {
+                    playerData.periodLogs.push({ startDate: targetTime, endDate: null });
+                    saveData();
+                    showToast("已标记为开始");
+                    addMessage("已记录。多喝热水。", "bartender");
+                }
+            }
+            else if (action === 'end') {
+                // 逻辑：找到在这个日期之前最近的一个 startDate，且没有 endDate (或者 endDate 被修改)
+                // 寻找 targetTime 之前最近的一个记录
+                let targetLog = null;
+                for (let i = playerData.periodLogs.length - 1; i >= 0; i--) {
+                    if (playerData.periodLogs[i].startDate <= targetTime) {
+                        targetLog = playerData.periodLogs[i];
+                        break;
+                    }
+                }
+                
+                if (targetLog) {
+                    targetLog.endDate = targetTime;
+                    saveData();
+                    showToast("已标记为结束");
+                } else {
+                    showToast("找不到对应的开始日期");
+                }
+            }
+            else if (action === 'clear') {
+                // 逻辑：如果选中的日期在某条记录内，删除整条记录 (或者询问)
+                // 这里为了方便，直接删除包含该日期的记录
+                const index = playerData.periodLogs.findIndex(l => {
+                    const e = l.endDate || (isPeriodOngoing(l) ? Date.now() : l.startDate); // 如果是进行中，暂且认为直到今天
+                    return targetTime >= l.startDate && targetTime <= e;
+                });
+                
+                if (index !== -1) {
+                    if(confirm("确定删除这条周期记录吗？")) {
+                        playerData.periodLogs.splice(index, 1);
+                        saveData();
+                        showToast("记录已删除");
+                    }
+                } else {
+                    showToast("该日期无记录");
+                }
+            }
+
+            renderPeriodCalendar();
+            updatePeriodInfoPanel();
+            }
+        
         // 账单
         function openHistory() { ui.modalBill.classList.add('open'); renderHistoryList(); renderPieChart(); }
         function closeHistory() { ui.modalBill.classList.remove('open'); }
@@ -1405,4 +1668,5 @@
     </script>
 </body>
 </html>
+
 
