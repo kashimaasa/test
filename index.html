@@ -146,18 +146,12 @@
             padding: 15px 20px 25px; background: var(--glass-bg);
             border-top: 1px solid var(--glass-border); flex-shrink: 0;
         }
-        .timer-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .timer-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
         .timer-display { font-size: 2em; color: var(--accent-color); font-variant-numeric: tabular-nums; font-weight: bold; }
         .time-setter { display: flex; align-items: center; color: var(--text-dim); font-size: 0.9em; }
         .time-input { background: rgba(0,0,0,0.2); border: 1px solid #555; color: var(--text-main); width: 50px; text-align: center; padding: 5px; margin: 0 8px; border-radius: 4px; font-size: 1.1em; font-weight: bold; }
         
-        /* 专注标签按钮 */
-        .focus-tag-btn {
-            width: 100%; background: rgba(0,0,0,0.1); border: 1px solid var(--glass-border);
-            color: var(--text-main); font-size: 0.95em; padding: 10px; margin-bottom: 12px; 
-            border-radius: 6px; cursor: pointer; transition: all 0.2s; text-align: center;
-        }
-        .focus-tag-btn:hover { border-color: var(--accent-color); color: var(--accent-color); }
+        /* 专注标签按钮已删除 */
         
         .action-row { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         button.action-btn {
@@ -341,10 +335,7 @@
                 </div>
             </div>
 
-            <!-- 专注标签选择 -->
-            <button class="focus-tag-btn" onclick="openTagModal()">
-                <span id="current-focus-tag">🏷️ 设定专注内容 (默认)</span>
-            </button>
+            <!-- 原“设定专注内容”大按钮已删除 -->
 
             <div class="action-row">
                 <button class="action-btn primary" id="focus-btn" onclick="toggleFocus()">开始专注</button>
@@ -504,7 +495,7 @@
             customInput: document.getElementById('custom-minutes'),
             timeSetterBox: document.getElementById('time-setter-box'),
             // Focus Tag UI
-            focusTagLabel: document.getElementById('current-focus-tag'),
+            focusTagLabel: null, // 元素已删除，设为null
             modalTags: document.getElementById('modal-tags'),
             tagsList: document.getElementById('tags-list'),
             newTagInput: document.getElementById('new-tag-input'),
@@ -801,7 +792,7 @@
                 playerData.tags = playerData.tags.filter(t => t !== tag);
                 if(state.currentFocusTag === tag) {
                     state.currentFocusTag = "默认";
-                    ui.focusTagLabel.innerText = "🏷️ 设定专注内容 (默认)";
+                    // 移除对不存在按钮的文本更新
                 }
                 saveData();
                 renderTags();
@@ -810,7 +801,7 @@
         
         function selectTag(tag) {
             state.currentFocusTag = tag;
-            ui.focusTagLabel.innerText = `🏷️ ${tag}`;
+            // 移除对不存在按钮的文本更新
             closeTagModal();
         }
 
@@ -868,8 +859,7 @@
             state.timeLeft = m * 60; state.initialTime = state.timeLeft; state.elapsedFocusTime = 0; state.isFocusing = true;
             
             ui.focusBtn.innerText = "停止专注"; ui.focusBtn.classList.add('active-state'); ui.timeSetterBox.style.display = 'none';
-            // Hide the tag selector button during focus
-            document.querySelector('.focus-tag-btn').style.display = 'none';
+            // 移除了隐藏标签按钮的代码，因为按钮已删除
 
             ui.statusText.innerText = "Cipher 将沙漏倒置...";
             initAudioContext(); ui.bgm.play().catch(e=>{});
@@ -906,7 +896,7 @@
             ui.focusBtn.innerText="开始专注"; 
             ui.focusBtn.classList.remove('active-state'); 
             ui.timeSetterBox.style.display='flex';
-            document.querySelector('.focus-tag-btn').style.display = 'block';
+            // 移除了显示标签按钮的代码，因为按钮已删除
         }
         function updateCoinUI() { ui.coinCount.innerText=playerData.coins; ui.storeCoinCount.innerText=playerData.coins; }
 
