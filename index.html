@@ -192,24 +192,58 @@
         option { background: #222; color: #ccc; }
         input[type="range"] { width: 80px; accent-color: var(--accent-color); }
 
-        /* === 提示系统 (Toast) === */
-        #toast-container {
-            position: fixed; top: 0; padding-top: 10px; left: 50%; transform: translateX(-50%);
-            z-index: 2000; display: flex; flex-direction: column; gap: 10px; pointer-events: none;
-            width: 80%; max-width: 300px; align-items: center;
-        }
-        .toast-message {
-            background: var(--toast-bg); color: var(--text-main);
-            padding: 8px 16px; border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
-            font-size: 0.9em; letter-spacing: 0.5px;
-            animation: toast-in 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
-            opacity: 0;
-        }
-        .toast-message.hiding { animation: toast-out 0.3s ease-in forwards; }
+        /* === 提示系统 (Toast) - 终极修正版 === */
+    #toast-container {
+        position: fixed;           /* 绝对固定，不随页面滚动 */
+        top: 50px;                 /* 距离屏幕顶部 50px */
+        left: 0; 
+        right: 0;                  /* 左右拉满，利用 flex 居中 */
+        z-index: 99999;            /* 最高层级 */
+        display: flex;
+        flex-direction: column;    /* 消息竖向排列 */
+        align-items: center;       /* 水平居中 */
+        justify-content: flex-start;
+        pointer-events: none;      /* 允许点击穿透 */
+        gap: 10px;                 /* 消息间距 */
+    }
 
+    .toast-message {
+        background: rgba(40, 40, 40, 0.95); /* 深色背景 */
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 50px;       /* 完全圆角 */
+        box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+        border: 1px solid rgba(255,255,255,0.1);
+        font-size: 0.9em;
+        max-width: 80%;            /* 防止文字太长超出屏幕 */
+        text-align: center;
+        backdrop-filter: blur(5px);
+        animation: toast-drop-in 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        pointer-events: auto;      /* 消息本身可以被触摸（比如滑动删除，暂未实现）*/
+    }
+    
+    /* 日间模式适配 */
+    body.day-mode .toast-message {
+        background: rgba(255, 255, 255, 0.95);
+        color: #333;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        border-color: rgba(0,0,0,0.05);
+    }
+
+    /* 弹跳动画 */
+    @keyframes toast-drop-in {
+        from { transform: translateY(-50px) scale(0.8); opacity: 0; }
+        to { transform: translateY(0) scale(1); opacity: 1; }
+    }
+    
+    /* 消失动画 */
+    .toast-message.hiding {
+        animation: toast-fade-out 0.3s ease forwards;
+    }
+    @keyframes toast-fade-out {
+        to { opacity: 0; transform: translateY(-20px); }
+    }
+        
         /* === 模态框通用 === */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -662,7 +696,20 @@
         color: #fff !important; /* 保持白色文字 */
         text-shadow: none;
     }
-        
+
+        /* === 修复：日间模式鱼粮看不清 === */
+    body.day-mode #food-count {
+        color: #e67e22 !important; /* 强制改为深橘色，既显眼又清晰 */
+        font-weight: bold;
+    }
+    
+    /* 顺便修复鱼缸底部文字的灰色太浅问题 */
+    body.day-mode #tab-pet > div[style*="text-align: center"] {
+        border-top-color: rgba(0,0,0,0.1) !important; /* 分割线变浅灰 */
+    }
+    body.day-mode #tab-pet div[style*="color: #888"] {
+        color: #555 !important; /* 文字变深灰 */
+    }
     </style>
 </head>
 <body class="">
@@ -2416,6 +2463,7 @@
 </script>
 </body>
 </html>
+
 
 
 
