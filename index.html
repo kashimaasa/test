@@ -18,6 +18,7 @@
             --diary-paper: #fdfbf7;
             --period-color: #ff6b81; 
             --period-predict: #ffb8c1;
+            --ovulation-color: #a29bfe; /* 排卵期颜色 */
             --shadow-color: rgba(0,0,0,0.5);
         }
 
@@ -74,7 +75,7 @@
 
         .vignette {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 90%); /* 调淡晕影适配日间 */
+            background: radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 90%);
             pointer-events: none; z-index: 0;
         }
 
@@ -115,7 +116,6 @@
             font-size: 0.8em; color: #ffdb4d; margin-left: 10px; font-weight: bold;
             display: flex; align-items: center; gap: 4px;
         }
-        /* Day Mode 下的金币颜色调整 */
         body.day-mode .coin-status { color: #d6b028; }
 
         /* 导航行 */
@@ -151,14 +151,13 @@
         .msg-user { align-self: flex-end; background-color: rgba(212, 175, 55, 0.15); color: #ddd; text-align: right; margin-left: 20px; }
         .msg-event { align-self: center; font-size: 0.85em; color: var(--accent-color); font-style: italic; opacity: 0.7; margin: 5px 0; text-align: center; }
 
-        /* 日间模式气泡适配 */
         body.day-mode .msg-bartender { color: #333; background: rgba(0,0,0,0.05); }
         body.day-mode .msg-user { color: #222; background: rgba(176, 141, 85, 0.2); }
 
         /* 3. Mid Section */
         .mid-section { padding: 0 15px 10px; flex-shrink: 0; }
         .panel-box {
-            background: rgba(0, 0, 0, 0.1); padding: 10px; /* 降低透明度适配日间 */
+            background: rgba(0, 0, 0, 0.1); padding: 10px;
             border-radius: 8px; border: 1px solid var(--glass-border);
         }
         .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
@@ -176,7 +175,7 @@
 
         /* 4. Controls */
         .controls-area {
-            padding: 15px 20px 25px; background: var(--glass-bg); /* 跟随主题 */
+            padding: 15px 20px 25px; background: var(--glass-bg);
             border-top: 1px solid var(--glass-border); flex-shrink: 0;
         }
         .timer-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
@@ -184,7 +183,6 @@
         .time-setter { display: flex; align-items: center; color: var(--text-dim); font-size: 0.9em; }
         .time-input { background: rgba(0,0,0,0.2); border: 1px solid #555; color: var(--text-main); width: 50px; text-align: center; padding: 5px; margin: 0 8px; border-radius: 4px; font-size: 1.1em; font-weight: bold; }
         
-        /* 专注标签输入 */
         .focus-tag-input {
             width: 100%; background: rgba(0,0,0,0.1); border: none; border-bottom: 1px solid #555;
             color: var(--text-main); font-size: 0.9em; padding: 5px; margin-bottom: 12px; outline: none;
@@ -206,7 +204,7 @@
         option { background: #222; color: #ccc; }
         input[type="range"] { width: 80px; accent-color: var(--accent-color); }
 
-        /* === 模态框通用 === */
+        /* === 模态框 === */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
@@ -214,7 +212,7 @@
         }
         .modal-overlay.open { display: block; opacity: 1; }
 
-        /* 账单 & 统计 弹窗 */
+        /* 账单 & 统计 */
         .receipt-modal {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 85%; max-width: 340px; background: var(--paper-color); color: #333;
@@ -229,14 +227,13 @@
         .data-controls { margin-top: 15px; display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; }
         .data-btn { font-size: 0.75em; background: #ddd; border: 1px solid #999; padding: 4px 8px; cursor: pointer; color: #333; margin-bottom: 5px; }
 
-        /* 扇形统计图容器 */
         .chart-container { margin: 15px 0; text-align: center; }
         .chart-svg { max-width: 150px; max-height: 150px; margin: 0 auto; display: block; transform: rotate(-90deg); border-radius: 50%;}
         .chart-legend { font-size: 0.75em; color: #555; margin-top: 10px; text-align: left; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;}
         .legend-item { display: flex; align-items: center; gap: 4px; }
         .legend-color { width: 10px; height: 10px; display: inline-block; border-radius: 2px; }
 
-        /* 商店 & 输入弹窗 */
+        /* 商店 & 输入 */
         .input-modal {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 90%; max-width: 360px; background: var(--card-bg); border: 1px solid #444;
@@ -255,7 +252,7 @@
         .item-desc { font-size: 0.75em; color: var(--text-dim); margin-top: 3px; }
         .buy-btn { background: #333; color: #ffdb4d; border: 1px solid #555; padding: 5px 12px; border-radius: 4px; font-size: 0.85em; cursor: pointer; white-space: nowrap; }
 
-        /* 宠物卡片 */
+        /* 宠物 */
         .pet-card { background: rgba(0,0,0,0.1); padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); display: flex; align-items: center; gap: 15px; }
         .pet-icon { font-size: 2.5em; animation: float 3s ease-in-out infinite; }
         .pet-stats { flex: 1; }
@@ -271,8 +268,15 @@
         .calendar-day-label { text-align: center; color: var(--text-dim); font-size: 0.75em; padding-bottom: 5px; }
         .calendar-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 4px; background: rgba(255,255,255,0.05); color: var(--text-dim); position: relative; }
         .calendar-day.today { border: 1px solid var(--text-main); color: var(--text-main); }
+        /* 经期样式 */
         .calendar-day.active-period { background: rgba(255, 107, 129, 0.4); color: var(--text-main); }
+        /* 预测经期 */
         .calendar-day.predicted { border: 1px dashed var(--period-color); color: var(--period-predict); }
+        /* 排卵日 */
+        .calendar-day.ovulation { border: 1px solid var(--ovulation-color); color: var(--ovulation-color); font-weight: bold; }
+        /* 易孕期 */
+        .calendar-day.fertile { background: rgba(162, 155, 254, 0.15); }
+
         .period-controls { display: flex; gap: 10px; margin-top: 15px; }
         .period-btn-action { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; color: #fff; opacity: 0.9; }
         .btn-start-period { background: var(--period-color); }
@@ -284,7 +288,7 @@
         .period-del-btn { color: #d9534f; cursor: pointer; margin-left: 10px;}
         .period-add-row { display: flex; gap: 5px; margin-top: 10px; align-items: center; font-size: 0.8em; color: #888;}
 
-        /* 日记本样式 */
+        /* 日记本 */
         .diary-modal-content {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 90%; max-width: 400px; height: 600px; max-height: 85vh;
@@ -330,7 +334,7 @@
     <div class="app-container" id="main-container">
         <!-- Header -->
         <div class="header-area">
-            <button class="theme-toggle-btn" onclick="toggleTheme()">☀️</button>
+            <button class="theme-toggle-btn" onclick="toggleTheme()">☀️/🌙</button>
             <div class="realtime-clock" id="clock">00:00</div>
             <div class="bartender-status">
                 <span class="mood-dot" id="mood-indicator"></span>
@@ -522,7 +526,7 @@
             focusBtn: document.getElementById('focus-btn'),
             customInput: document.getElementById('custom-minutes'),
             timeSetterBox: document.getElementById('time-setter-box'),
-            focusTagInput: document.getElementById('focus-tag-input'), // New
+            focusTagInput: document.getElementById('focus-tag-input'),
             bgm: document.getElementById('bgm'),
             noiseSelector: document.getElementById('noise-selector'),
             volumeSlider: document.getElementById('volume'),
@@ -530,8 +534,8 @@
             modalBill: document.getElementById('modal-bill'),
             historyList: document.getElementById('history-list'),
             totalSessions: document.getElementById('total-sessions'),
-            pieChart: document.getElementById('pie-chart'), // New
-            chartLegend: document.getElementById('chart-legend'), // New
+            pieChart: document.getElementById('pie-chart'),
+            chartLegend: document.getElementById('chart-legend'),
             
             modalTodo: document.getElementById('modal-todo'),
             todoInput: document.getElementById('todo-input-field'),
@@ -549,8 +553,8 @@
             periodStatus: document.getElementById('period-status'),
             calMonthLabel: document.getElementById('cal-month-label'),
             calDaysContainer: document.getElementById('calendar-days-container'),
-            periodHistoryList: document.getElementById('period-history-list'), // New
-            periodAddDate: document.getElementById('period-add-date'), // New
+            periodHistoryList: document.getElementById('period-history-list'),
+            periodAddDate: document.getElementById('period-add-date'),
             // Diary
             modalDiary: document.getElementById('modal-diary'),
             diaryListView: document.getElementById('diary-list-view'),
@@ -653,7 +657,6 @@
             document.addEventListener("visibilitychange", () => {
                 if (document.hidden && state.isFocusing) {
                     addMessage("Cipher 皱了皱眉：“你刚才去哪了？时钟可是不会等人的。”", "bartender");
-                    // 也可以选择在这里暂停计时或惩罚
                 }
             });
         };
@@ -803,68 +806,98 @@
             if (confirm("确定要撕掉这一页吗？")) { playerData.diaryEntries = playerData.diaryEntries.filter(e => e.id !== state.currentDiaryId); saveData(); showDiaryList(); }
         }
 
-        // --- 生理期系统 (增强版) ---
+        // --- 生理期系统 (三阶段逻辑+智能预测) ---
         function openPeriodModal() { 
             ui.modalPeriod.classList.add('open'); 
             renderPeriodCalendar(); 
             updatePeriodStatus(); 
-            renderPeriodHistory(); // Show history
+            renderPeriodHistory(); 
         }
         function closePeriodModal() { ui.modalPeriod.classList.remove('open'); }
+        
+        // 状态判断
         function isPeriodActive() {
             if (playerData.periodLogs.length === 0) return false;
             const lastLog = playerData.periodLogs[playerData.periodLogs.length - 1];
             if (!lastLog.endDate) {
-                const diff = (Date.now() - lastLog.startDate) / (1000 * 60 * 60 * 24);
-                return diff < 10;
+                // 防止忘记结束，超过14天自动视为异常，但逻辑上仍是Active
+                return true; 
             }
             return false;
         }
+
         function logPeriodStart() {
             if (isPeriodActive()) return alert("你已经记录了本次生理期开始。");
             playerData.periodLogs.push({ startDate: Date.now(), endDate: null });
+            // 保持时间顺序
+            playerData.periodLogs.sort((a,b) => a.startDate - b.startDate);
+            
             saveData(); renderPeriodCalendar(); updatePeriodStatus(); renderPeriodHistory();
             addMessage("Cipher 默默调高了室内的空调温度。", "event");
         }
+
         function logPeriodEnd() {
             if (!isPeriodActive()) return alert("当前没有进行中的生理期记录。");
-            playerData.periodLogs[playerData.periodLogs.length - 1].endDate = Date.now();
+            const lastLog = playerData.periodLogs[playerData.periodLogs.length - 1];
+            lastLog.endDate = Date.now();
+            
             saveData(); renderPeriodCalendar(); updatePeriodStatus(); renderPeriodHistory();
             addMessage("身体恢复了吗？真是太好了。", "bartender");
         }
-        // 动态预测
-        function getAverageCycle() {
-            if (playerData.periodLogs.length < 2) return 28; // Default
-            let totalDiff = 0;
-            let count = 0;
-            // 计算最近3次周期的平均值
-            for(let i = playerData.periodLogs.length - 1; i > 0 && count < 3; i--) {
+
+        // 智能预测算法
+        function getCycleStats() {
+            if (playerData.periodLogs.length < 2) return { avgCycle: 28, avgDuration: 5 };
+            
+            let totalCycle = 0;
+            let cycleCount = 0;
+            // 计算最近6次周期的平均值
+            for(let i = playerData.periodLogs.length - 1; i > 0 && cycleCount < 6; i--) {
                 const current = playerData.periodLogs[i].startDate;
                 const prev = playerData.periodLogs[i-1].startDate;
-                totalDiff += (current - prev);
-                count++;
+                totalCycle += (current - prev);
+                cycleCount++;
             }
-            const avgMs = totalDiff / count;
-            return Math.round(avgMs / (1000 * 60 * 60 * 24));
+            
+            const avgCycleDays = cycleCount > 0 ? Math.round(totalCycle / cycleCount / (86400000)) : 28;
+            return { avgCycle: avgCycleDays };
         }
+
         function predictNextPeriod() {
             if (playerData.periodLogs.length === 0) return null;
-            const lastStart = playerData.periodLogs[playerData.periodLogs.length - 1].startDate;
-            const avgCycle = getAverageCycle();
+            const lastLog = playerData.periodLogs[playerData.periodLogs.length - 1];
+            const lastStart = lastLog.startDate;
+            const { avgCycle } = getCycleStats();
+            
             return lastStart + (avgCycle * 24 * 60 * 60 * 1000);
         }
+
         function updatePeriodStatus() {
+            const lastLog = playerData.periodLogs[playerData.periodLogs.length - 1];
+            
             if (isPeriodActive()) {
-                ui.periodStatus.innerText = "当前状态：生理期中"; ui.periodStatus.style.color = "#ff6b81";
+                const days = Math.floor((Date.now() - lastLog.startDate) / (86400000)) + 1;
+                ui.periodStatus.innerText = `生理期进行中 (第 ${days} 天)`; 
+                ui.periodStatus.style.color = "#ff6b81";
             } else {
-                const nextDate = predictNextPeriod();
-                if (nextDate) {
-                    const daysLeft = Math.ceil((nextDate - Date.now()) / (1000 * 60 * 60 * 24));
-                    ui.periodStatus.innerText = `预测：下一次经期约在 ${daysLeft} 天后 (周期约${getAverageCycle()}天)`;
+                const nextDateTs = predictNextPeriod();
+                if (nextDateTs) {
+                    const nextDate = new Date(nextDateTs);
+                    const daysLeft = Math.ceil((nextDateTs - Date.now()) / (86400000));
+                    const dateStr = `${nextDate.getMonth()+1}月${nextDate.getDate()}日`;
+                    
+                    if(daysLeft < 0) {
+                        ui.periodStatus.innerText = `推迟了 ${Math.abs(daysLeft)} 天 (预测: ${dateStr})`;
+                    } else {
+                        ui.periodStatus.innerText = `预测: ${dateStr} 来访 (还有 ${daysLeft} 天)`;
+                    }
                     ui.periodStatus.style.color = "#ffb8c1";
-                } else { ui.periodStatus.innerText = "暂无足够记录预测"; }
+                } else { 
+                    ui.periodStatus.innerText = "暂无足够记录预测"; 
+                }
             }
         }
+
         function renderPeriodCalendar() {
             const container = ui.calDaysContainer; container.innerHTML = '';
             const now = new Date();
@@ -874,11 +907,18 @@
             for (let i = 0; i < firstDay.getDay(); i++) container.appendChild(document.createElement('div'));
             
             const predictedTs = predictNextPeriod();
-            const predictDate = predictedTs ? new Date(predictedTs) : null;
+            let ovulationTs = null;
+            if(predictedTs) {
+                // 排卵日通常在下次月经前14天
+                ovulationTs = predictedTs - (14 * 86400000);
+            }
 
             for (let d = 1; d <= lastDay.getDate(); d++) {
                 const div = document.createElement('div'); div.className = 'calendar-day'; div.innerText = d;
                 const currentTs = new Date(now.getFullYear(), now.getMonth(), d).getTime();
+                const currentDayEnd = currentTs + 86399999;
+                
+                // 标记历史/进行中
                 let isPeriod = false;
                 playerData.periodLogs.forEach(log => {
                     const start = new Date(log.startDate).setHours(0,0,0,0);
@@ -886,19 +926,39 @@
                     if (currentTs >= start && currentTs <= end) isPeriod = true;
                 });
                 if (isPeriod) div.classList.add('active-period');
+                
+                // 标记今天
                 if (d === now.getDate()) div.classList.add('today');
-                if (predictDate && predictDate.getMonth() === now.getMonth() && predictDate.getDate() === d) div.classList.add('predicted');
+                
+                // 标记预测经期 (预测日及后4天)
+                if (predictedTs && !isPeriod) {
+                    const pStart = new Date(predictedTs).setHours(0,0,0,0);
+                    const pEnd = pStart + (4 * 86400000); // 假设持续5天
+                    if (currentTs >= pStart && currentTs <= pEnd) div.classList.add('predicted');
+                }
+
+                // 标记排卵期 (排卵日±2天)
+                if (ovulationTs && !isPeriod) {
+                    const oStart = new Date(ovulationTs).setHours(0,0,0,0);
+                    if (Math.abs(currentTs - oStart) < 86400000 / 2) {
+                        div.classList.add('ovulation'); // 排卵日
+                    } else if (Math.abs(currentTs - oStart) <= 2 * 86400000) {
+                        div.classList.add('fertile'); // 易孕期
+                    }
+                }
+
                 container.appendChild(div);
             }
         }
+
         // 补录与历史
         function renderPeriodHistory() {
             ui.periodHistoryList.innerHTML = '';
+            // 倒序显示
             playerData.periodLogs.slice().reverse().forEach((log, index) => {
-                // index is reversed index
                 const realIndex = playerData.periodLogs.length - 1 - index;
                 const s = new Date(log.startDate).toLocaleDateString();
-                const e = log.endDate ? new Date(log.endDate).toLocaleDateString() : '进行中';
+                const e = log.endDate ? new Date(log.endDate).toLocaleDateString() : '进行中...';
                 const div = document.createElement('div');
                 div.className = 'period-history-item';
                 div.innerHTML = `<span>${s} - ${e}</span> <span class="period-del-btn" onclick="deletePeriodLog(${realIndex})">×</span>`;
@@ -915,10 +975,8 @@
             const val = ui.periodAddDate.value;
             if(!val) return alert("请选择日期");
             const ts = new Date(val).getTime();
-            // 简单的插入逻辑：如果最近一次没结束，不允许插。实际应该更复杂，这里简化处理允许补录新的开始。
             if(isPeriodActive()) return alert("请先结束当前的记录");
             playerData.periodLogs.push({ startDate: ts, endDate: null });
-            // sort logs by date
             playerData.periodLogs.sort((a,b) => a.startDate - b.startDate);
             saveData(); renderPeriodCalendar(); updatePeriodStatus(); renderPeriodHistory();
             alert("补录开始日期成功");
@@ -927,7 +985,6 @@
             const val = ui.periodAddDate.value;
             if(!val) return alert("请选择日期");
             const ts = new Date(val).getTime();
-            // 找最近一个没有结束日期的
             const openLog = playerData.periodLogs.find(l => !l.endDate);
             if(!openLog) return alert("没有进行中的记录可结束");
             if(ts < openLog.startDate) return alert("结束日期不能早于开始日期");
@@ -1125,8 +1182,6 @@
                 // If it's a full circle (one item)
                 let d = "";
                 if (Math.abs(angle - 360) < 0.1) {
-                    d = `M 1 0 A 1 1 0 1 1 -1 0 A 1 1 0 1 1 1 0`; // Simplified full circle approximation for SVG path or use <circle>
-                    // Actually clearer to just use Circle if 100%
                     const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
                     circle.setAttribute("cx", "0"); circle.setAttribute("cy", "0"); circle.setAttribute("r", "1");
                     circle.setAttribute("fill", colors[colorIdx % colors.length]);
