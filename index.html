@@ -13,8 +13,8 @@
             --card-bg: #1a1a1a; /* 输入卡片/商店背景 */
             --text-main: #e0e0e0;
             --text-dim: #888;
-            --period-color: #ff6b81; /* 生理期颜色 */
-            --period-predict: #ffb8c1; /* 预测期颜色 */
+            --period-color: #ff6b81; /* 生理期主色 */
+            --period-predict: #ffb8c1;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -105,6 +105,7 @@
             transition: all 0.2s;
         }
         .icon-btn:active { transform: scale(0.9); background: var(--accent-color); color: #000; }
+        /* 生理期按钮特殊样式 */
         .icon-btn.period-btn { color: var(--period-color); border-color: rgba(255, 107, 129, 0.3); }
 
         /* 2. Chat */
@@ -219,26 +220,18 @@
         .progress-fill { height: 100%; transition: width 0.5s; }
         .feed-btn-small { background: rgba(255,255,255,0.1); border: none; color: #fff; font-size: 0.8em; padding: 2px 8px; border-radius: 4px; cursor: pointer; }
 
-        /* === 生理期日历样式 === */
+        /* 生理期日历 */
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: #ccc; }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; margin-bottom: 15px; font-size: 0.85em; }
         .calendar-day-label { text-align: center; color: #666; font-size: 0.75em; padding-bottom: 5px; }
-        .calendar-day { 
-            aspect-ratio: 1; display: flex; align-items: center; justify-content: center; 
-            border-radius: 4px; background: rgba(255,255,255,0.05); color: #888; position: relative;
-        }
+        .calendar-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 4px; background: rgba(255,255,255,0.05); color: #888; position: relative; }
         .calendar-day.today { border: 1px solid #fff; color: #fff; }
         .calendar-day.active-period { background: rgba(255, 107, 129, 0.4); color: #fff; }
         .calendar-day.predicted { border: 1px dashed var(--period-color); color: var(--period-predict); }
-        
         .period-controls { display: flex; gap: 10px; margin-top: 15px; }
-        .period-btn-action { 
-            flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; 
-            font-weight: bold; color: #fff; opacity: 0.9;
-        }
+        .period-btn-action { flex: 1; padding: 10px; border-radius: 8px; border: none; cursor: pointer; font-weight: bold; color: #fff; opacity: 0.9; }
         .btn-start-period { background: var(--period-color); }
         .btn-end-period { background: #333; border: 1px solid #555; }
-        
         .period-status-text { font-size: 0.9em; color: var(--period-predict); margin-bottom: 10px; min-height: 1.2em;}
 
         .input-field { width: 100%; background: #252525; border: 1px solid #555; color: #fff; padding: 10px; border-radius: 6px; font-size: 1em; margin-bottom: 20px; outline: none; }
@@ -308,7 +301,7 @@
         </div>
     </div>
 
-    <!-- 弹窗1：时光账单 & 数据管理 -->
+    <!-- 弹窗：时光账单 -->
     <div id="modal-bill" class="modal-overlay">
         <div class="receipt-modal">
             <div class="receipt-header">
@@ -317,7 +310,6 @@
                 <p id="total-sessions" style="font-size: 0.8em; margin-top:5px;">累计专注: 0 次</p>
             </div>
             <ul id="history-list" class="receipt-list"></ul>
-            
             <div style="margin-top: 15px; border-top: 1px dashed #999; padding-top: 10px; text-align: center;">
                 <p style="font-size: 0.8em; color: #666; margin-bottom: 5px;">数据备份</p>
                 <div class="data-controls">
@@ -330,7 +322,7 @@
         </div>
     </div>
 
-    <!-- 弹窗2：待办输入 -->
+    <!-- 弹窗：待办 -->
     <div id="modal-todo" class="modal-overlay">
         <div class="input-modal">
             <h3>新增待办</h3>
@@ -342,7 +334,7 @@
         </div>
     </div>
 
-    <!-- 弹窗3：商店 -->
+    <!-- 弹窗：商店 -->
     <div id="modal-store" class="modal-overlay">
         <div class="input-modal">
             <h3><span>杂货铺</span><span class="coin-balance">🪙 <span id="store-coin-count">0</span></span></h3>
@@ -362,24 +354,19 @@
         </div>
     </div>
 
-    <!-- 弹窗4：生理期记录 (新增) -->
+    <!-- 弹窗：生理期 -->
     <div id="modal-period" class="modal-overlay">
         <div class="input-modal">
             <h3><span>周期记录</span><span style="font-size:0.7em; color:var(--period-color)">🌺</span></h3>
-            <div class="period-status-text" id="period-status">预测：下一次经期在 15 天后</div>
-            
-            <div class="calendar-header">
-                <span id="cal-month-label">Month Year</span>
-            </div>
-            <div class="calendar-grid">
+            <div class="period-status-text" id="period-status">加载中...</div>
+            <div class="calendar-header"><span id="cal-month-label">Month</span></div>
+            <div class="calendar-grid" style="margin-bottom:0">
                 <div class="calendar-day-label">日</div><div class="calendar-day-label">一</div>
                 <div class="calendar-day-label">二</div><div class="calendar-day-label">三</div>
                 <div class="calendar-day-label">四</div><div class="calendar-day-label">五</div>
                 <div class="calendar-day-label">六</div>
-                <!-- JS生成日期 -->
             </div>
-            <div id="calendar-days-container" class="calendar-grid" style="margin-bottom:0;"></div>
-
+            <div id="calendar-days-container" class="calendar-grid"></div>
             <div class="period-controls">
                 <button class="period-btn-action btn-start-period" onclick="logPeriodStart()">姨妈来了</button>
                 <button class="period-btn-action btn-end-period" onclick="logPeriodEnd()">姨妈走了</button>
@@ -432,6 +419,7 @@
             cafe: "https://actions.google.com/sounds/v1/ambiences/coffee_shop.ogg"
         };
 
+        // --- 丰富的数据配置 (恢复) ---
         const FISH_TYPES = {
             'guppy': { name: '孔雀鱼', icon: '🐟', price: 10, desc: '色彩斑斓，活泼好动，适合新手。' },
             'neon': { name: '红绿灯鱼', icon: '🐠', price: 20, desc: '体侧有霓虹光带，群游时像流动的光。' },
@@ -447,6 +435,42 @@
             { id: 'drink_warm', name: '壁炉', price: 5, desc: '热红酒与肉桂', quote: '希望这杯酒能暖一暖你疲惫的灵魂。' }
         ];
 
+        // 完整的对话系统 (恢复)
+        const chatTopics = [
+            { id: 'tired', user: ["我觉得有点累。", "今天过得好漫长。", "能量耗尽了。"] },
+            { id: 'story', user: ["讲讲你的故事吧。", "这里一直都这么安静吗？", "你有在等的人吗？"] },
+            { id: 'advice', user: ["给我一点建议吧。", "我有点迷茫。", "接下来该做什么？"] },
+            { id: 'weather', user: ["这雨什么时候会停？", "外面好冷。", "这种天气真让人想睡觉。"] }
+        ];
+
+        const bartenderResponses = {
+            calm: {
+                tired: ["累了就歇会儿。在这里，时间是静止的。", "闭上眼，听听冰块融化的声音，不用急着赶路。"],
+                story: ["我的故事没什么特别的，只是在这吧台后面看了很久的人来人往。", "这里是时间的避难所。只要你愿意，它就存在。"],
+                advice: ["如果不知道方向，就先停下来。有时候，答案在静默中。", "做你现在能做的，剩下的交给时间。"],
+                weather: ["不用管外面的风雨。在这里，只有温暖的灯光。", "雨声是最好的白噪音，不是吗？"]
+            },
+            melancholic: {
+                tired: ["疲惫是活着的证明，但也没必要一直逞强。", "把重担放下吧，哪怕只有几分钟。"],
+                story: ["故事往往都是关于遗憾的。我在这里，也许只是为了守住某些回忆。", "我们都是被困在琥珀里的虫子，挣扎也只是姿态。"],
+                advice: ["我也在寻找答案。或许，接受迷茫本身就是一种解脱。", "在这个混乱的世界里，能专注做好一件事就很奢侈了。"],
+                weather: ["这场雨让我想起了一个很久没见的人。", "阴天的时候，回忆总是特别清晰。"]
+            },
+            cheerful: {
+                tired: ["喝杯水休息一下，我相信你马上就能满血复活。", "辛苦了！这杯水我请客，为了你的努力。"],
+                story: ["我看过很多人在这里哭，但最后他们都笑着走出去了。", "这里唯一的秘密，就是这里的客人都很特别——比如你。"],
+                advice: ["别想太多，有时候直觉是最准的。", "我看好你。你的下一个计划一定会顺利的。"],
+                weather: ["不管外面怎么样，心里的天要是晴的就行。", "你不觉得这种天气很有情调吗？"]
+            }
+        };
+
+        const idleActions = {
+            calm: ["正在仔细擦拭一只水晶杯...", "正在阅读一张泛黄的旧报纸...", "整理着吧台后的酒瓶..."],
+            melancholic: ["望着窗外的雨丝出神...", "抚摸着一枚旧银戒...", "看着空酒杯发呆..."],
+            cheerful: ["哼着不知名的爵士小调...", "微笑着向您致意...", "正在尝试新的调酒配方..."]
+        };
+
+        // --- 状态数据 ---
         let state = {
             isFocusing: false, timeLeft: 0, initialTime: 0, timerId: null, audioContext: null, mood: 'calm', completedCount: 0, elapsedFocusTime: 0
         };
@@ -455,12 +479,10 @@
             coins: 0,
             inventory: { fishFood: 0 },
             ownedFish: [],
-            // 新增生理期数据结构
-            periodLogs: [], // { startDate: timestamp, endDate: timestamp }
-            cycleLength: 28 
+            periodLogs: [] // { startDate: timestamp, endDate: timestamp }
         };
 
-        // --- 初始化 ---
+        // --- 初始化与加载 ---
         window.onload = () => {
             loadData();
             setInterval(() => {
@@ -468,20 +490,52 @@
                 ui.clock.innerText = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false });
                 updatePetStatsLoop();
             }, 1000);
+            
             ui.bgm.src = sounds.rain; ui.bgm.volume = 0.4;
             ui.bgm.addEventListener('ended', function() { this.currentTime = 0; this.play(); }, false);
             
-            // 初始问候
-            if(isPeriodActive()) {
-                 addMessage("欢迎回来。（递上热毛巾）这几天要注意保暖。", "bartender");
-            } else {
-                 addMessage("欢迎光临深巷浮木。", "bartender");
-            }
+            getWeatherAndGreet(); // 恢复天气API调用
             startBartenderAI();
             updateCoinUI();
         };
 
-        // --- 数据逻辑 (含修复) ---
+        function getWeatherAndGreet() {
+            // 如果处于生理期，优先显示关怀信息
+            if(isPeriodActive()) {
+                 addMessage("（注意到你有些虚弱）欢迎回来。外面风大，先进来暖和一下。", "bartender");
+                 state.mood = 'calm';
+                 return;
+            }
+
+            if ("geolocation" in navigator) {
+                addMessage("（Cipher 望向窗外）正在确认外面的天气...", "event");
+                navigator.geolocation.getCurrentPosition(async (pos) => {
+                    try {
+                        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}&current_weather=true`);
+                        const data = await res.json();
+                        handleWeather(data.current_weather);
+                    } catch (e) { addMessage("欢迎。这里永远为你敞开。", "bartender"); }
+                }, () => addMessage("欢迎光临深巷浮木。", "bartender"));
+            } else { addMessage("欢迎光临。", "bartender"); }
+        }
+
+        function handleWeather(w) {
+            const code = w.weathercode;
+            if (code <= 3) { state.mood = 'calm'; addMessage("外面是个晴朗的夜晚，适合独处。", "bartender"); }
+            else if (code >= 51) { state.mood = 'melancholic'; addMessage("下雨了，进来躲躲吧。", "bartender"); }
+            else { state.mood = 'cheerful'; addMessage("今晚的风很舒服。", "bartender"); }
+            updateStatusUI();
+        }
+
+        function updateStatusUI() {
+            const actions = idleActions[state.mood];
+            const action = actions[Math.floor(Math.random() * actions.length)];
+            ui.statusText.innerText = `Cipher ${action}`;
+            const colors = { calm: '#d4af37', melancholic: '#a8a8ff', cheerful: '#ffb366' };
+            ui.moodDot.style.backgroundColor = colors[state.mood];
+        }
+
+        // --- 数据存取与文件修复 ---
         function saveData() {
             localStorage.setItem('driftwood_v2_data', JSON.stringify(playerData));
             localStorage.setItem('driftwood_history', ui.historyList.innerHTML);
@@ -492,10 +546,9 @@
             const saved = localStorage.getItem('driftwood_v2_data');
             if (saved) {
                 playerData = JSON.parse(saved);
-                // 确保数据结构完整（针对老用户）
                 if (!playerData.periodLogs) playerData.periodLogs = [];
             } else {
-                // 迁移旧版
+                // 迁移
                 const oldData = localStorage.getItem('driftwood_data');
                 if (oldData) {
                     try {
@@ -512,7 +565,6 @@
             if (count) { state.completedCount = parseInt(count); ui.totalSessions.innerText = `累计专注: ${state.completedCount} 次`; }
         }
 
-        // --- 修复后的文件导入/导出 ---
         function exportDataFile() {
             const data = {
                 player: playerData,
@@ -538,21 +590,17 @@
         function handleFileImport(input) {
             const file = input.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const data = JSON.parse(e.target.result);
-                    // 修复校验逻辑：只校验必要字段，history 可选
+                    // 宽松校验
                     if (data && typeof data === 'object' && data.player) {
                         playerData = data.player;
-                        // 确保导入的数据包含新功能字段
                         if (!playerData.periodLogs) playerData.periodLogs = [];
-                        
                         if (data.history) ui.historyList.innerHTML = data.history;
                         state.completedCount = data.count || 0;
                         ui.totalSessions.innerText = `累计专注: ${state.completedCount} 次`;
-                        
                         saveData();
                         alert("存档导入成功！页面将自动刷新。");
                         location.reload();
@@ -560,59 +608,37 @@
                         throw new Error("存档结构不完整");
                     }
                 } catch (err) {
-                    alert("错误：文件已损坏或格式不正确。\n请确保您上传的是由本应用导出的 .json 文件。");
-                    console.error(err);
+                    alert("错误：文件已损坏或格式不正确。");
                 }
             };
             reader.readAsText(file);
             input.value = '';
         }
 
-        // --- 生理期功能 ---
-        function openPeriodModal() {
-            ui.modalPeriod.classList.add('open');
-            renderPeriodCalendar();
-            updatePeriodStatus();
-        }
+        // --- 生理期系统 ---
+        function openPeriodModal() { ui.modalPeriod.classList.add('open'); renderPeriodCalendar(); updatePeriodStatus(); }
         function closePeriodModal() { ui.modalPeriod.classList.remove('open'); }
-
         function isPeriodActive() {
             if (playerData.periodLogs.length === 0) return false;
             const lastLog = playerData.periodLogs[playerData.periodLogs.length - 1];
-            // 如果没有结束日期，或者结束日期就是今天，或者开始日期距今小于7天且没点结束
             if (!lastLog.endDate) {
-                // 防止忘记点结束，超过10天自动视为结束
                 const diff = (Date.now() - lastLog.startDate) / (1000 * 60 * 60 * 24);
                 return diff < 10;
             }
             return false;
         }
-
         function logPeriodStart() {
-            if (isPeriodActive()) {
-                alert("你已经记录了本次生理期开始。");
-                return;
-            }
+            if (isPeriodActive()) return alert("你已经记录了本次生理期开始。");
             playerData.periodLogs.push({ startDate: Date.now(), endDate: null });
-            saveData();
-            renderPeriodCalendar();
-            updatePeriodStatus();
-            addMessage("Cipher 默默调高了室内的温度。", "event");
+            saveData(); renderPeriodCalendar(); updatePeriodStatus();
+            addMessage("Cipher 默默调高了室内的空调温度。", "event");
         }
-
         function logPeriodEnd() {
-            if (!isPeriodActive()) {
-                alert("当前没有进行中的生理期记录。");
-                return;
-            }
-            const lastLog = playerData.periodLogs[playerData.periodLogs.length - 1];
-            lastLog.endDate = Date.now();
-            saveData();
-            renderPeriodCalendar();
-            updatePeriodStatus();
+            if (!isPeriodActive()) return alert("当前没有进行中的生理期记录。");
+            playerData.periodLogs[playerData.periodLogs.length - 1].endDate = Date.now();
+            saveData(); renderPeriodCalendar(); updatePeriodStatus();
             addMessage("身体恢复了吗？真是太好了。", "bartender");
         }
-
         function updatePeriodStatus() {
             if (isPeriodActive()) {
                 ui.periodStatus.innerText = "当前状态：生理期中";
@@ -628,67 +654,39 @@
                 }
             }
         }
-
         function predictNextPeriod() {
             if (playerData.periodLogs.length === 0) return null;
             const lastStart = playerData.periodLogs[playerData.periodLogs.length - 1].startDate;
-            return lastStart + (28 * 24 * 60 * 60 * 1000); // 简单 +28天预测
+            return lastStart + (28 * 24 * 60 * 60 * 1000);
         }
-
         function renderPeriodCalendar() {
-            const container = ui.calDaysContainer;
-            container.innerHTML = '';
-            
+            const container = ui.calDaysContainer; container.innerHTML = '';
             const now = new Date();
-            const year = now.getFullYear();
-            const month = now.getMonth();
-            ui.calMonthLabel.innerText = `${year}年 ${month + 1}月`;
-
-            const firstDay = new Date(year, month, 1);
-            const lastDay = new Date(year, month + 1, 0);
-            const daysInMonth = lastDay.getDate();
-            const startDayIndex = firstDay.getDay(); // 0 is Sunday
-
-            // 填充空白
-            for (let i = 0; i < startDayIndex; i++) {
-                const div = document.createElement('div');
-                div.className = 'calendar-day'; 
-                div.style.background = 'transparent';
-                container.appendChild(div);
-            }
-
-            const today = now.getDate();
+            ui.calMonthLabel.innerText = `${now.getFullYear()}年 ${now.getMonth() + 1}月`;
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            for (let i = 0; i < firstDay.getDay(); i++) container.appendChild(document.createElement('div'));
+            
             const predictedTs = predictNextPeriod();
             const predictDate = predictedTs ? new Date(predictedTs) : null;
 
-            for (let d = 1; d <= daysInMonth; d++) {
-                const div = document.createElement('div');
-                div.className = 'calendar-day';
-                div.innerText = d;
-                
-                // 检查是否在记录范围内
-                const currentTs = new Date(year, month, d).getTime();
+            for (let d = 1; d <= lastDay.getDate(); d++) {
+                const div = document.createElement('div'); div.className = 'calendar-day'; div.innerText = d;
+                const currentTs = new Date(now.getFullYear(), now.getMonth(), d).getTime();
                 let isPeriod = false;
-                
                 playerData.periodLogs.forEach(log => {
                     const start = new Date(log.startDate).setHours(0,0,0,0);
                     const end = log.endDate ? new Date(log.endDate).setHours(23,59,59,999) : (isPeriodActive() ? Date.now() : start);
                     if (currentTs >= start && currentTs <= end) isPeriod = true;
                 });
-
                 if (isPeriod) div.classList.add('active-period');
-                if (d === today) div.classList.add('today');
-                
-                // 预测高亮
-                if (predictDate && predictDate.getMonth() === month && predictDate.getDate() === d) {
-                    div.classList.add('predicted');
-                }
-
+                if (d === now.getDate()) div.classList.add('today');
+                if (predictDate && predictDate.getMonth() === now.getMonth() && predictDate.getDate() === d) div.classList.add('predicted');
                 container.appendChild(div);
             }
         }
 
-        // --- 商店 & 宠物 ---
+        // --- 商店 & 宠物 (恢复) ---
         function openStore() { ui.modalStore.classList.add('open'); renderShopItems(); renderAquarium(); }
         function closeStore() { ui.modalStore.classList.remove('open'); }
         function switchStoreTab(tab) {
@@ -698,38 +696,20 @@
             ui.tabPet.style.display = tab === 'pet' ? 'block' : 'none';
             if(tab === 'pet') renderAquarium();
         }
-
         function renderShopItems() {
             ui.tabShop.innerHTML = '';
             createShopItem('fish_food', '特制鱼粮', '恢复30饱食度', 2, () => buyFood());
-            
-            Object.keys(FISH_TYPES).forEach(key => {
-                const fish = FISH_TYPES[key];
-                createShopItem(key, fish.name, fish.desc, fish.price, () => buyFish(key));
-            });
-
-            SPECIAL_DRINKS.forEach(drink => {
-                createShopItem(drink.id, drink.name, drink.desc, drink.price, () => buyDrink(drink), false, true);
-            });
+            Object.keys(FISH_TYPES).forEach(key => createShopItem(key, FISH_TYPES[key].name, FISH_TYPES[key].desc, FISH_TYPES[key].price, () => buyFish(key)));
+            SPECIAL_DRINKS.forEach(drink => createShopItem(drink.id, drink.name, drink.desc, drink.price, () => buyDrink(drink), false, true));
         }
-
         function createShopItem(id, name, desc, price, action, isSold=false, isDrink=false) {
-            const el = document.createElement('div');
-            el.className = `store-item ${isDrink?'drink-item':''}`;
-            el.innerHTML = `
-                <div class="item-info"><span class="item-name">${isDrink?'🍸 ':''}${name}</span><span class="item-desc">${desc}</span></div>
-                <button class="buy-btn">${price} G</button>`;
-            el.querySelector('.buy-btn').onclick = action;
-            ui.tabShop.appendChild(el);
+            const el = document.createElement('div'); el.className = `store-item ${isDrink?'drink-item':''}`;
+            el.innerHTML = `<div class="item-info"><span class="item-name">${isDrink?'🍸 ':''}${name}</span><span class="item-desc">${desc}</span></div><button class="buy-btn">${price} G</button>`;
+            el.querySelector('.buy-btn').onclick = action; ui.tabShop.appendChild(el);
         }
-
         function buyFood() {
-            if (playerData.coins >= 2) {
-                playerData.coins -= 2; playerData.inventory.fishFood++;
-                updateCoinUI(); addMessage("购买了鱼粮。", "event"); saveData(); renderShopItems();
-            } else alert("金币不足");
+            if (playerData.coins >= 2) { playerData.coins -= 2; playerData.inventory.fishFood++; updateCoinUI(); addMessage("购买了鱼粮。", "event"); saveData(); renderShopItems(); } else alert("金币不足");
         }
-
         function buyFish(type, isFree=false) {
             const fish = FISH_TYPES[type];
             if (isFree || playerData.coins >= fish.price) {
@@ -738,15 +718,13 @@
                 updateCoinUI(); addMessage(`你带回了「${fish.name}」。`, "event"); saveData(); renderShopItems();
             } else alert("金币不足");
         }
-
         function buyDrink(drink) {
-            // 生理期特殊判断
+            // 生理期拦截
             if (isPeriodActive() && (drink.id === 'drink_mute' || drink.id === 'drink_old')) {
                 addMessage("（Cipher 挡住了酒单）“这两天还是不要喝冰的和烈酒比较好。”", "bartender");
                 setTimeout(() => addMessage("“我会为你准备一杯热红糖姜茶，这杯算我请的。”", "bartender"), 1500);
                 return;
             }
-
             if (playerData.coins >= drink.price) {
                 playerData.coins -= drink.price; updateCoinUI(); closeStore();
                 addMessage(`点了一杯「${drink.name}」。`, "user");
@@ -754,24 +732,14 @@
                 saveData();
             } else alert("金币不足");
         }
-
         function renderAquarium() {
-            ui.petListContainer.innerHTML = '';
-            ui.foodCount.innerText = playerData.inventory.fishFood;
+            ui.petListContainer.innerHTML = ''; ui.foodCount.innerText = playerData.inventory.fishFood;
             if (playerData.ownedFish.length === 0) { ui.petEmptyMsg.style.display = 'block'; return; }
             ui.petEmptyMsg.style.display = 'none';
-
             playerData.ownedFish.forEach(fish => {
                 const config = FISH_TYPES[fish.type];
                 const card = document.createElement('div'); card.className = 'pet-card';
-                card.innerHTML = `
-                    <div class="pet-icon">${config.icon}</div>
-                    <div class="pet-stats">
-                        <div class="pet-name">${config.name}</div>
-                        <div class="stat-row"><span>饱食</span><div class="progress-bg"><div class="progress-fill" style="width:${fish.hunger}%; background:${getColor(fish.hunger)}"></div></div></div>
-                        <div class="stat-row"><span>心情</span><div class="progress-bg"><div class="progress-fill" style="width:${fish.happy}%; background:${getColor(fish.happy)}"></div></div></div>
-                    </div>
-                    <button class="feed-btn-small" onclick="feedFish(${fish.id})">喂食</button>`;
+                card.innerHTML = `<div class="pet-icon">${config.icon}</div><div class="pet-stats"><div class="pet-name">${config.name}</div><div class="stat-row"><span>饱食</span><div class="progress-bg"><div class="progress-fill" style="width:${fish.hunger}%; background:${getColor(fish.hunger)}"></div></div></div><div class="stat-row"><span>心情</span><div class="progress-bg"><div class="progress-fill" style="width:${fish.happy}%; background:${getColor(fish.happy)}"></div></div></div></div><button class="feed-btn-small" onclick="feedFish(${fish.id})">喂食</button>`;
                 ui.petListContainer.appendChild(card);
             });
         }
@@ -823,37 +791,51 @@
         function resetUI() { ui.focusBtn.innerText="开始专注"; ui.focusBtn.classList.remove('active-state'); ui.timeSetterBox.style.display='flex'; }
         function updateCoinUI() { ui.coinCount.innerText=playerData.coins; ui.storeCoinCount.innerText=playerData.coins; }
 
-        // --- 聊天 & 交互 ---
+        // --- 核心对话逻辑 (Rich Dialogue + Period Integration) ---
         function chatWithBartender() {
             if (state.isFocusing) return addMessage("嘘... 钟摆还在走。", "bartender");
             
-            // 生理期特殊对话
-            if (isPeriodActive()) {
+            // 1. 生理期特殊关怀 (50% 概率触发，或用户选择"tired"类话题时)
+            if (isPeriodActive() && Math.random() < 0.6) {
                 const comfortLines = [
                     "这里有热可可，还有毯子。如果不舒服，可以随时在沙发上躺一会儿。",
                     "我把店里的音乐换成了更轻柔的。今天不要勉强自己。",
                     "需要暖宝宝吗？我这里常备着。",
-                    "不用担心，即使什么都不做，也没人会责怪你。"
+                    "不用担心，即使什么都不做，也没人会责怪你。",
+                    "多喝点热水吧，虽然是老生常谈，但确实有用。"
                 ];
-                const r = Math.floor(Math.random() * comfortLines.length);
-                addMessage(comfortLines[r], "bartender");
+                addMessage(comfortLines[Math.floor(Math.random() * comfortLines.length)], "bartender");
                 return;
             }
 
-            const topics = ["今天过得怎么样？", "这里一直这么安静吗？", "给我讲个故事吧。"];
-            const responses = ["还不错，特别是此刻。", "安静是这里的特产。", "故事都在酒里，要自己品。"];
-            const r = Math.floor(Math.random() * topics.length);
-            addMessage(topics[r], "user");
-            setTimeout(() => addMessage(responses[r], "bartender"), 1000);
+            // 2. 正常丰富对话逻辑 (恢复 V1 版本)
+            const topicObj = chatTopics[Math.floor(Math.random() * chatTopics.length)];
+            const topicID = topicObj.id;
+            const userText = topicObj.user[Math.floor(Math.random() * topicObj.user.length)];
+            
+            addMessage(userText, "user");
+            
+            setTimeout(() => {
+                // 根据心情获取回复
+                const responseList = bartenderResponses[state.mood][topicID] || bartenderResponses['calm'][topicID];
+                const reply = responseList[Math.floor(Math.random() * responseList.length)];
+                addMessage(reply, "bartender");
+            }, 1000);
         }
 
         function orderDrink() {
             if (state.isFocusing) return addMessage("（Cipher 摇摇头）专注时只提供白水。", "bartender");
             
+            // 生理期不建议喝冷饮
             if (isPeriodActive()) {
                 addMessage("请给我一杯随心饮。", "user");
                 setTimeout(() => {
-                    addMessage("（端来一杯冒着热气的红枣茶）“今天喝这个吧，对身体好。”", "bartender");
+                    const hotDrinks = [
+                        "（端来一杯冒着热气的红枣茶）“今天喝这个吧，对身体好。”",
+                        "（递给你一杯温热的牛奶）“加了一点蜂蜜，能助眠。”",
+                        "（准备了一杯玫瑰花茶）“暖暖手。”"
+                    ];
+                    addMessage(hotDrinks[Math.floor(Math.random()*hotDrinks.length)], "bartender");
                 }, 1000);
                 return;
             }
@@ -865,11 +847,20 @@
         function startBartenderAI() {
             setInterval(() => {
                 if (state.isFocusing) return;
-                if (Math.random() < 0.2) {
-                    const events = ["Cipher 往杯中加了一块老冰。", "Cipher 换了一张黑胶唱片。", "风铃轻响，似有故人来。"];
+                
+                // 随机切换心情 (恢复 V1)
+                const r = Math.random();
+                if (r < 0.5) state.mood = 'calm';
+                else if (r < 0.8) state.mood = 'melancholic';
+                else state.mood = 'cheerful';
+                updateStatusUI();
+
+                // 随机环境事件 (恢复 V1)
+                if (Math.random() < 0.25) {
+                    const events = ["Cipher 往杯中加了一块老冰。", "Cipher 换了一张黑胶唱片。", "风铃轻响，似有故人来。", "Cipher 轻轻擦拭着吧台上的水渍。"];
                     addMessage(events[Math.floor(Math.random()*events.length)], "event");
                 }
-            }, 40000);
+            }, 30000);
         }
 
         // --- 工具 ---
