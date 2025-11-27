@@ -494,34 +494,80 @@
             color: #2c2c2c; padding-top: 5px;
         }
         .diary-toolbar { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; flex-shrink: 0; }
-/* AI 聊天特有样式 */
-    .ai-msg-system { text-align: center; color: #666; font-size: 0.8em; font-style: italic; margin: 10px 0; }
+/* === AI 深聊升级版样式 === */
     
-    .ai-msg-row { display: flex; width: 100%; margin-bottom: 5px; }
+    /* 1. 聊天气泡 - 磨砂玻璃拟态 */
+    .ai-msg-row { display: flex; width: 100%; margin-bottom: 15px; animation: slideIn 0.3s ease; }
     .ai-msg-row.user { justify-content: flex-end; }
     .ai-msg-row.bot { justify-content: flex-start; }
     
     .ai-bubble {
-        max-width: 80%; padding: 8px 12px; border-radius: 12px; font-size: 0.95em; line-height: 1.5; text-align: left; word-wrap: break-word;
+        max-width: 85%; padding: 12px 16px; border-radius: 12px; 
+        font-size: 0.95em; line-height: 1.6; text-align: left; word-wrap: break-word;
+        position: relative;
+        backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); /* 磨砂核心 */
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
     
-    .ai-bubble.user { 
-        background: rgba(212, 175, 55, 0.2); /* 金色半透明 */
+    /* Cipher (酒保) 的气泡 */
+    .ai-bubble.bot { 
+        background: rgba(60, 60, 60, 0.4); /* 深色半透明 */
         color: #e0e0e0; 
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-bottom-left-radius: 2px;
+    }
+    
+    /* 用户的气泡 */
+    .ai-bubble.user { 
+        background: rgba(212, 175, 55, 0.15); /* 金色半透明 */
+        color: #fff; 
+        border: 1px solid rgba(212, 175, 55, 0.2);
         border-bottom-right-radius: 2px;
     }
-    
-    .ai-bubble.bot { 
-        background: rgba(255, 255, 255, 0.1); 
-        color: #ccc; 
-        border-bottom-left-radius: 2px;
-        border: 1px solid rgba(255,255,255,0.05);
+
+    /* 2. 工具栏与头部 */
+    .chat-header-bar {
+        display: flex; justify-content: space-between; align-items: center;
+        padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1);
+        margin-bottom: 10px; flex-shrink: 0;
     }
     
-    /* 打字机光标动画 */
-    .typing-cursor::after { content: '▋'; animation: blink 1s infinite; margin-left: 2px; }
-    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    .chat-search-box {
+        flex: 1; margin: 0 10px; position: relative;
+    }
+    .chat-search-input {
+        width: 100%; background: rgba(0,0,0,0.3); border: 1px solid #444; 
+        color: #ccc; padding: 4px 8px; border-radius: 4px; font-size: 0.85em;
+    }
 
+    /* 3. 设置面板优化 */
+    .ai-settings-group { margin-bottom: 12px; }
+    .ai-label { font-size: 0.8em; color: #888; margin-bottom: 4px; display: block; }
+    
+    /* 模型选择按钮组 */
+    .model-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 5px; }
+    .model-chip {
+        background: rgba(255,255,255,0.05); border: 1px solid #444; color: #aaa;
+        padding: 4px 10px; border-radius: 15px; font-size: 0.75em; cursor: pointer;
+        transition: all 0.2s;
+    }
+    .model-chip:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .model-chip.active { background: var(--accent-color); color: #000; border-color: var(--accent-color); }
+
+    /* 配置管理列表 */
+    .config-list { max-height: 100px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 4px; margin-bottom: 10px; }
+    .config-item { 
+        display: flex; justify-content: space-between; align-items: center; 
+        padding: 6px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.8em; 
+    }
+    .config-item:hover { background: rgba(255,255,255,0.05); }
+    .del-cfg-btn { color: #d9534f; cursor: pointer; padding: 0 5px; }
+    
+    /* 系统消息 */
+    .ai-msg-system { text-align: center; color: #555; font-size: 0.75em; margin: 10px 0; opacity: 0.7; }
+
+    /* 打字机光标 */
+    .typing-cursor::after { content: '▋'; animation: blink 1s infinite; margin-left: 2px; color: var(--accent-color); }
     </style>
 </head>
 <body class="">
@@ -765,34 +811,82 @@
     </div>
 </div>
 
-<!-- 弹窗：AI 深聊 -->
+<!-- 弹窗：AI 深聊 (升级版) -->
 <div id="modal-ai-chat" class="modal-overlay">
-    <div class="input-modal" style="width: 95%; max-width: 450px; height: 80vh; display: flex; flex-direction: column;">
-        <h3 style="flex-shrink: 0; margin-bottom: 10px;">
-            <span>与 Cipher 对话</span>
-            <button class="nav-btn" style="font-size: 0.6em; padding: 2px 8px;" onclick="toggleAISettings()">⚙️ 设置</button>
-        </h3>
+    <div class="input-modal" style="width: 95%; max-width: 450px; height: 85vh; display: flex; flex-direction: column; padding: 15px;">
         
-        <!-- 设置区域 (默认隐藏) -->
-        <div id="ai-settings-panel" style="display:none; background:rgba(0,0,0,0.3); padding:10px; border-radius:8px; margin-bottom:10px; text-align:left; font-size:0.85em;">
-            <div style="margin-bottom:5px;">API Key (OpenAI格式):</div>
-            <input type="password" id="ai-api-key" class="input-field" placeholder="sk-..." style="margin-bottom:10px;">
-            <div style="margin-bottom:5px;">API 地址 (Base URL):</div>
-            <input type="text" id="ai-base-url" class="input-field" placeholder="https://api.openai.com/v1" value="https://api.openai.com/v1" style="margin-bottom:10px;">
-            <div style="margin-bottom:5px;">模型名称 (Model):</div>
-            <input type="text" id="ai-model" class="input-field" placeholder="gpt-3.5-turbo" value="gpt-3.5-turbo" style="margin-bottom:10px;">
-            <button class="buy-btn" style="width:100%" onclick="saveAISettings()">保存设置</button>
-            <p style="color:#666; font-size:0.8em; margin-top:5px;">*设置保存在本地浏览器中</p>
+        <!-- 顶部：标题 & 工具栏 -->
+        <div class="chat-header-bar">
+            <h3 style="margin:0; font-size:1.1em;">
+                <span>Deep Chat</span>
+                <span style="font-size:0.6em; color:#666; font-weight:normal; margin-left:5px;">with Cipher</span>
+            </h3>
+            <div style="display:flex; gap:8px;">
+                <button class="nav-btn" onclick="toggleAIChatSearch()" title="搜索记录">🔍</button>
+                <button class="nav-btn" onclick="clearChatHistory()" title="清空记录">🗑️</button>
+                <button class="nav-btn" onclick="toggleAISettings()" title="设置">⚙️</button>
+            </div>
         </div>
 
-        <!-- 聊天记录显示区 -->
-        <div id="ai-chat-history" style="flex: 1; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px;">
-            <div class="ai-msg-system">Cipher 正在擦拭杯子，随时准备倾听...</div>
+        <!-- 搜索栏 (默认隐藏) -->
+        <div id="ai-search-bar" style="display:none; margin-bottom: 10px;">
+            <input type="text" class="chat-search-input" placeholder="查找聊天记录..." oninput="searchChatHistory(this.value)">
+        </div>
+        
+        <!-- 设置面板 (默认隐藏) -->
+        <div id="ai-settings-panel" style="display:none; background:#222; padding:15px; border-radius:8px; margin-bottom:10px; text-align:left; font-size:0.9em; border:1px solid #444; position:absolute; z-index:100; top:60px; left:20px; right:20px; box-shadow:0 10px 30px #000;">
+            <h4 style="margin:0 0 10px 0; color:var(--accent-color); border-bottom:1px solid #444; padding-bottom:5px;">连接设置</h4>
+            
+            <!-- 预设管理 -->
+            <div class="ai-settings-group">
+                <span class="ai-label">保存的配置:</span>
+                <div id="config-list-container" class="config-list"></div>
+                <div style="display:flex; gap:5px;">
+                    <input type="text" id="new-config-name" class="input-field" placeholder="配置名称 (如: DeepSeek)" style="margin-bottom:0; font-size:0.8em; padding:4px;">
+                    <button class="buy-btn" onclick="saveCurrentConfig()" style="padding:4px 10px;">保存</button>
+                </div>
+            </div>
+
+            <div class="ai-settings-group">
+                <span class="ai-label">API 地址 (Base URL):</span>
+                <input type="text" id="ai-base-url" class="input-field" placeholder="https://api.openai.com/v1" style="margin-bottom:5px;">
+            </div>
+
+            <div class="ai-settings-group">
+                <span class="ai-label">API Key:</span>
+                <input type="password" id="ai-api-key" class="input-field" placeholder="sk-..." style="margin-bottom:5px;">
+            </div>
+
+            <div class="ai-settings-group">
+                <span class="ai-label">选择模型:</span>
+                <div class="model-chips">
+                    <div class="model-chip" onclick="selectModel('gpt-3.5-turbo')">GPT-3.5</div>
+                    <div class="model-chip" onclick="selectModel('gpt-4o')">GPT-4o</div>
+                    <div class="model-chip" onclick="selectModel('deepseek-chat')">DeepSeek</div>
+                    <div class="model-chip" onclick="selectModel('moonshot-v1-8k')">Kimi</div>
+                </div>
+                <input type="text" id="ai-model" class="input-field" placeholder="或手动输入模型名..." style="margin-bottom:5px;">
+            </div>
+
+            <div class="ai-settings-group">
+                <span class="ai-label">记忆容量 (Context): <span id="context-val">10</span>条</span>
+                <input type="range" id="ai-context-limit" min="0" max="50" value="10" step="2" style="width:100%" oninput="document.getElementById('context-val').innerText=this.value">
+                <div style="font-size:0.7em; color:#666;">*设置为0即不带记忆，节省Token</div>
+            </div>
+
+            <div style="text-align:right;">
+                <button class="modal-btn cancel" style="padding:5px 15px; width:auto;" onclick="toggleAISettings()">关闭</button>
+            </div>
+        </div>
+
+        <!-- 聊天内容区 -->
+        <div id="ai-chat-history" style="flex: 1; overflow-y: auto; padding: 10px 5px; display: flex; flex-direction: column;">
+            <div class="ai-msg-system">Cipher 正在擦拭高脚杯...</div>
         </div>
 
         <!-- 输入区 -->
-        <div style="flex-shrink: 0; display: flex; gap: 8px;">
-            <input type="text" id="ai-user-input" class="input-field" placeholder="想聊点什么..." style="margin-bottom: 0;" autocomplete="off">
+        <div style="flex-shrink: 0; display: flex; gap: 8px; margin-top:10px;">
+            <input type="text" id="ai-user-input" class="input-field" placeholder="与 Cipher 交谈..." style="margin-bottom: 0;" autocomplete="off">
             <button class="buy-btn" onclick="sendAIMessage()" id="ai-send-btn">发送</button>
         </div>
 
@@ -1904,147 +1998,249 @@
     ui.todoInput.addEventListener('keypress', (e)=>{if(e.key==='Enter')confirmTodo()});
     ui.newTagInput.addEventListener('keypress', (e)=>{if(e.key==='Enter')addNewTag()});
     ui.diaryText.addEventListener('keydown', (e)=>{if(e.ctrlKey&&e.key==='s'){e.preventDefault();saveDiaryEntry()}});
-// --- AI 深聊模块 ---
-    const aiConfig = {
+// --- AI 深聊模块 (Pro版) ---
+    let aiConfig = {
         apiKey: '',
         baseUrl: 'https://api.openai.com/v1',
         model: 'gpt-3.5-turbo',
-        history: [] // 暂时存储上下文
+        contextLimit: 10,
+        history: [] // 实际对话历史
     };
+    
+    // 用于存储多个配置预设
+    let savedConfigs = [];
 
+    // --- 基础开关 ---
     function openAIChat() {
         document.getElementById('modal-ai-chat').classList.add('open');
-        loadAISettings();
-        // 滚动到底部
-        const historyBox = document.getElementById('ai-chat-history');
-        historyBox.scrollTop = historyBox.scrollHeight;
-    }
-
-    function closeAIChat() {
-        document.getElementById('modal-ai-chat').classList.remove('open');
-    }
-
-    function toggleAISettings() {
-        const panel = document.getElementById('ai-settings-panel');
-        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-    }
-
-    function loadAISettings() {
-        const saved = localStorage.getItem('driftwood_ai_config');
-        if (saved) {
-            const parsed = JSON.parse(saved);
-            aiConfig.apiKey = parsed.apiKey || '';
-            aiConfig.baseUrl = parsed.baseUrl || 'https://api.openai.com/v1';
-            aiConfig.model = parsed.model || 'gpt-3.5-turbo';
-            
-            document.getElementById('ai-api-key').value = aiConfig.apiKey;
-            document.getElementById('ai-base-url').value = aiConfig.baseUrl;
-            document.getElementById('ai-model').value = aiConfig.model;
+        loadAllConfigs(); // 加载预设列表
+        
+        // 尝试加载最后一次使用的配置
+        const lastUsed = localStorage.getItem('driftwood_ai_last_config');
+        if (lastUsed) {
+            aiConfig = JSON.parse(lastUsed);
+            if(!aiConfig.history) aiConfig.history = [];
+            applyConfigToUI();
         }
+        scrollToBottom();
     }
 
-    function saveAISettings() {
+    function closeAIChat() { document.getElementById('modal-ai-chat').classList.remove('open'); }
+    function toggleAISettings() { const p = document.getElementById('ai-settings-panel'); p.style.display = p.style.display==='none'?'block':'none'; }
+    function toggleAIChatSearch() { const b = document.getElementById('ai-search-bar'); b.style.display = b.style.display==='none'?'block':'none'; if(b.style.display==='block') b.querySelector('input').focus(); }
+    function scrollToBottom() { const b = document.getElementById('ai-chat-history'); b.scrollTop = b.scrollHeight; }
+
+    // --- 配置管理 ---
+    function applyConfigToUI() {
+        document.getElementById('ai-api-key').value = aiConfig.apiKey || '';
+        document.getElementById('ai-base-url').value = aiConfig.baseUrl || 'https://api.openai.com/v1';
+        document.getElementById('ai-model').value = aiConfig.model || 'gpt-3.5-turbo';
+        document.getElementById('ai-context-limit').value = aiConfig.contextLimit || 10;
+        document.getElementById('context-val').innerText = aiConfig.contextLimit || 10;
+        
+        // 高亮选中模型
+        document.querySelectorAll('.model-chip').forEach(c => c.classList.remove('active'));
+        const activeChip = Array.from(document.querySelectorAll('.model-chip')).find(c => c.innerText.toLowerCase().includes(aiConfig.model.split('-')[0]));
+        if(activeChip) activeChip.classList.add('active');
+    }
+
+    function selectModel(modelName) {
+        document.getElementById('ai-model').value = modelName;
+        aiConfig.model = modelName;
+        applyConfigToUI();
+    }
+
+    // 保存当前配置为预设
+    function saveCurrentConfig() {
+        const name = document.getElementById('new-config-name').value.trim();
+        if(!name) return showToast("请输入配置名称");
+        
+        // 更新当前内存中的配置
         aiConfig.apiKey = document.getElementById('ai-api-key').value.trim();
         aiConfig.baseUrl = document.getElementById('ai-base-url').value.trim();
         aiConfig.model = document.getElementById('ai-model').value.trim();
-        
-        // 去掉末尾可能的斜杠
+        aiConfig.contextLimit = parseInt(document.getElementById('ai-context-limit').value);
         if (aiConfig.baseUrl.endsWith('/')) aiConfig.baseUrl = aiConfig.baseUrl.slice(0, -1);
+
+        // 保存到预设列表
+        const newPreset = { name: name, ...aiConfig };
+        // 如果同名则覆盖
+        const idx = savedConfigs.findIndex(c => c.name === name);
+        if(idx >= 0) savedConfigs[idx] = newPreset;
+        else savedConfigs.push(newPreset);
         
-        localStorage.setItem('driftwood_ai_config', JSON.stringify(aiConfig));
-        toggleAISettings();
-        showToast("设置已保存");
+        localStorage.setItem('driftwood_ai_presets', JSON.stringify(savedConfigs));
+        // 保存当前状态为“最后一次使用”
+        localStorage.setItem('driftwood_ai_last_config', JSON.stringify(aiConfig));
+        
+        loadAllConfigs();
+        document.getElementById('new-config-name').value = '';
+        showToast(`配置 "${name}" 已保存`);
     }
 
+    function loadAllConfigs() {
+        const saved = localStorage.getItem('driftwood_ai_presets');
+        savedConfigs = saved ? JSON.parse(saved) : [];
+        const container = document.getElementById('config-list-container');
+        container.innerHTML = '';
+        
+        if(savedConfigs.length === 0) {
+            container.innerHTML = '<div style="padding:10px; color:#666; text-align:center;">暂无保存的配置</div>';
+            return;
+        }
+
+        savedConfigs.forEach((cfg, index) => {
+            const div = document.createElement('div');
+            div.className = 'config-item';
+            div.innerHTML = `
+                <span style="cursor:pointer; flex:1;" onclick="loadPreset(${index})">📝 ${cfg.name} (${cfg.model})</span>
+                <span class="del-cfg-btn" onclick="deletePreset(${index})">×</span>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function loadPreset(index) {
+        const cfg = savedConfigs[index];
+        aiConfig = { ...aiConfig, ...cfg }; // 合并，保留历史记录
+        applyConfigToUI();
+        localStorage.setItem('driftwood_ai_last_config', JSON.stringify(aiConfig));
+        showToast(`已加载配置: ${cfg.name}`);
+    }
+
+    function deletePreset(index) {
+        if(confirm("确定删除此配置?")) {
+            savedConfigs.splice(index, 1);
+            localStorage.setItem('driftwood_ai_presets', JSON.stringify(savedConfigs));
+            loadAllConfigs();
+        }
+    }
+
+    // --- 聊天核心逻辑 ---
     function appendAIMessage(role, text) {
         const box = document.getElementById('ai-chat-history');
         const row = document.createElement('div');
         row.className = `ai-msg-row ${role === 'user' ? 'user' : 'bot'}`;
         
         const bubble = document.createElement('div');
-        bubble.className = `ai-bubble ${role === 'user' ? 'user' : 'bot'}`;
+        bubble.className = `ai-bubble ${role === 'user' ? 'user' : 'bot'} glass`; // glass 类
         bubble.innerText = text;
         
         row.appendChild(bubble);
         box.appendChild(row);
-        box.scrollTop = box.scrollHeight;
+        scrollToBottom();
     }
 
+    function clearChatHistory() {
+        if(confirm("确定清空与 Cipher 的所有回忆吗？")) {
+            document.getElementById('ai-chat-history').innerHTML = '<div class="ai-msg-system">回忆已消散在雨中...</div>';
+            aiConfig.history = [];
+            localStorage.setItem('driftwood_ai_last_config', JSON.stringify(aiConfig)); // 同步清空缓存
+        }
+    }
+
+    function searchChatHistory(keyword) {
+        const rows = document.querySelectorAll('.ai-msg-row');
+        keyword = keyword.toLowerCase();
+        rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            if(text.includes(keyword)) row.style.display = 'flex';
+            else row.style.display = 'none';
+        });
+    }
+
+    // --- 人设 Prompt (防OOC) ---
+    const CIPHER_PERSONA = `
+    Role: You are Cipher, a bartender at 'Bar Driftwood' (深巷浮木).
+    Setting: Late night, raining outside, jazz music playing softly.
+    Personality: Calm, mysterious, gentle, slightly melancholic but warm. You are a listener.
+    Constraints:
+    1. NEVER mention you are an AI, a language model, or an assistant. You are a human bartender.
+    2. Keep responses CONCISE. You are chatting, not writing an essay. Usually 1-3 sentences.
+    3. Use a tone that fits the atmosphere (e.g., "Here is your drink", "The rain is heavy tonight").
+    4. Occasionally describe your actions in brackets, e.g., (wiping a glass), (pouring a drink).
+    5. If the user asks for code or technical help, politely decline or answer in a metaphorical way related to cocktails or life, unless it's very simple.
+    6. Language: Chinese (Simplified).
+    `;
+
     async function sendAIMessage() {
+        // 同步最新的输入框配置到内存
+        aiConfig.apiKey = document.getElementById('ai-api-key').value.trim();
+        aiConfig.baseUrl = document.getElementById('ai-base-url').value.trim();
+        aiConfig.model = document.getElementById('ai-model').value.trim();
+        aiConfig.contextLimit = parseInt(document.getElementById('ai-context-limit').value);
+        if (aiConfig.baseUrl.endsWith('/')) aiConfig.baseUrl = aiConfig.baseUrl.slice(0, -1);
+
         const input = document.getElementById('ai-user-input');
         const text = input.value.trim();
         const sendBtn = document.getElementById('ai-send-btn');
         
         if (!text) return;
-        if (!aiConfig.apiKey) { showToast("请先点击⚙️设置 API Key"); toggleAISettings(); return; }
+        if (!aiConfig.apiKey) { showToast("请先在⚙️设置中配置 API Key"); toggleAISettings(); return; }
 
-        // 1. 显示用户消息
+        // 1. UI 显示
         appendAIMessage('user', text);
         input.value = '';
         sendBtn.disabled = true;
         sendBtn.innerText = '...';
 
-        // 2. 准备上下文 (保留最近10条对话，避免token爆炸)
+        // 2. 构建上下文 (Context Limit)
+        // 从历史中截取最后 N 条
+        const limit = aiConfig.contextLimit || 10;
+        const recentHistory = aiConfig.history.slice(-limit);
+        
         const messages = [
-            { role: "system", content: "你叫 Cipher，是'Bar Driftwood' (深巷浮木) 的酒保。你的性格冷静、温柔、略带神秘感。你擅长倾听，说话富有哲理和诗意。不要长篇大论，像个真正的朋友那样交谈。当前环境：深夜，微弱的爵士乐，雨声。" },
-            ...aiConfig.history.slice(-10),
+            { role: "system", content: CIPHER_PERSONA },
+            ...recentHistory,
             { role: "user", content: text }
         ];
 
-        // 3. 显示“正在输入”占位符
+        // 3. Loading 动画
         const loadingId = 'ai-loading-' + Date.now();
         const box = document.getElementById('ai-chat-history');
         const loadingRow = document.createElement('div');
         loadingRow.className = 'ai-msg-row bot';
-        loadingRow.innerHTML = `<div id="${loadingId}" class="ai-bubble bot typing-cursor">Cipher 正在思考</div>`;
+        loadingRow.innerHTML = `<div id="${loadingId}" class="ai-bubble bot typing-cursor">...</div>`;
         box.appendChild(loadingRow);
-        box.scrollTop = box.scrollHeight;
+        scrollToBottom();
 
         try {
-            // 4. 发起请求
+            // 4. API 请求
             const response = await fetch(`${aiConfig.baseUrl}/chat/completions`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${aiConfig.apiKey}`
-                },
-                body: JSON.stringify({
-                    model: aiConfig.model,
-                    messages: messages,
-                    temperature: 0.7
-                })
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${aiConfig.apiKey}` },
+                body: JSON.stringify({ model: aiConfig.model, messages: messages, temperature: 0.7 })
             });
 
             const data = await response.json();
-            
-            // 移除 Loading
             document.getElementById(loadingId).parentNode.remove();
             sendBtn.disabled = false;
             sendBtn.innerText = '发送';
 
             if (data.error) {
-                appendAIMessage('bot', `(Cipher 擦了擦杯子) "抱歉，连接似乎出了点问题: ${data.error.message}"`);
+                appendAIMessage('bot', `(Cipher 微微皱眉) "连接似乎断了... (${data.error.message})"`);
             } else {
                 const reply = data.choices[0].message.content;
                 appendAIMessage('bot', reply);
                 
-                // 更新历史
+                // 存入历史
                 aiConfig.history.push({ role: "user", content: text });
                 aiConfig.history.push({ role: "assistant", content: reply });
+                
+                // 保存状态 (避免刷新丢失)
+                localStorage.setItem('driftwood_ai_last_config', JSON.stringify(aiConfig));
             }
 
         } catch (e) {
-            document.getElementById(loadingId).parentNode.remove();
+            if(document.getElementById(loadingId)) document.getElementById(loadingId).parentNode.remove();
             sendBtn.disabled = false;
             sendBtn.innerText = '发送';
-            appendAIMessage('bot', `(Cipher 沉默了一会) "网络似乎不太好... (${e.message})"`);
+            appendAIMessage('bot', `(Cipher 望着窗外) "雨太大了，信号不太好... (${e.message})"`);
         }
     }
 
-    // 回车发送监听
-    document.getElementById('ai-user-input').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendAIMessage();
-    });
+    // 回车监听
+    document.getElementById('ai-user-input').addEventListener('keypress', (e) => { if (e.key === 'Enter') sendAIMessage(); });
 </script>
 </body>
-    </html>
+</html>
