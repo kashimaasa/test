@@ -6,11 +6,11 @@
     <title>Bar Driftwood - 深巷浮木</title>
     <style>
         :root {
-            /* 默认夜间模式变量 */
+            /* 夜间模式 (默认) */
             --bg-image: url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=1920&auto=format&fit=crop');
             --glass-bg: rgba(18, 18, 18, 0.95);
             --glass-border: rgba(255, 255, 255, 0.08);
-            --accent-color: #d4af37; /* 香槟金 */
+            --accent-color: #d4af37;
             --text-main: #e0e0e0;
             --text-dim: #888;
             --card-bg: #1a1a1a;
@@ -22,16 +22,16 @@
             --shadow-color: rgba(0,0,0,0.5);
         }
 
-        /* 日间模式变量覆盖 */
+        /* 日间模式 */
         body.day-mode {
             --bg-image: url('https://images.unsplash.com/photo-1509042239860-f550ce710b93?q=80&w=1920&auto=format&fit=crop');
-            --glass-bg: rgba(245, 245, 245, 0.85);
+            --glass-bg: rgba(245, 245, 245, 0.9);
             --glass-border: rgba(0, 0, 0, 0.08);
             --accent-color: #b08d55;
             --text-main: #2c2c2c;
             --text-dim: #666;
             --card-bg: #ffffff;
-            --shadow-color: rgba(0,0,0,0.1);
+            --shadow-color: rgba(0,0,0,0.15);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -50,9 +50,10 @@
             flex-direction: column;
             overflow: hidden;
             user-select: none;
-            transition: background-image 0.5s ease;
+            transition: background-image 0.5s ease, color 0.5s ease;
         }
 
+        /* 动画 */
         @keyframes modal-in { from { transform: translate(-50%, -40%) scale(0.95); opacity: 0; } to { transform: translate(-50%, -50%) scale(1); opacity: 1; } }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes alert-flash { 0% { box-shadow: inset 0 0 0 rgba(212, 175, 55, 0); } 50% { box-shadow: inset 0 0 80px rgba(212, 175, 55, 0.4); } 100% { box-shadow: inset 0 0 0 rgba(212, 175, 55, 0); } }
@@ -105,12 +106,12 @@
         }
         body.day-mode .coin-status { color: #d6b028; }
 
-        /* 导航行 - 6个按钮 */
+        /* 导航行 */
         .nav-row {
             display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;
             margin-top: 15px; padding-top: 12px;
             border-top: 1px solid var(--glass-border);
-            position: relative; z-index: 10;
+            position: relative; z-index: 5;
         }
         .nav-btn {
             background: transparent;
@@ -118,9 +119,9 @@
             color: var(--text-dim);
             padding: 6px 12px; border-radius: 4px; font-size: 0.85em;
             cursor: pointer; transition: all 0.2s; font-family: inherit; letter-spacing: 1px;
-            pointer-events: auto; /* 确保可点击 */
         }
         .nav-btn:hover { color: var(--accent-color); border-color: var(--accent-color); background: rgba(255,255,255,0.05); }
+        .nav-btn:active { transform: scale(0.95); }
         .nav-btn.special { color: var(--period-color); border-color: rgba(255, 107, 129, 0.3); }
 
         /* 2. Chat */
@@ -140,7 +141,7 @@
         body.day-mode .msg-bartender { color: #333; background: rgba(0,0,0,0.05); }
         body.day-mode .msg-user { color: #222; background: rgba(176, 141, 85, 0.2); }
 
-        /* 4. Controls */
+        /* 3. Controls */
         .controls-area {
             padding: 15px 20px 25px; background: var(--glass-bg);
             border-top: 1px solid var(--glass-border); flex-shrink: 0;
@@ -150,11 +151,14 @@
         .time-setter { display: flex; align-items: center; color: var(--text-dim); font-size: 0.9em; }
         .time-input { background: rgba(0,0,0,0.2); border: 1px solid #555; color: var(--text-main); width: 50px; text-align: center; padding: 5px; margin: 0 8px; border-radius: 4px; font-size: 1.1em; font-weight: bold; }
         
-        .current-tag-display {
-            text-align: left; font-size: 0.8em; color: var(--text-dim); 
-            margin-bottom: 12px; height: 1.2em; display: flex; align-items: center; gap: 5px;
+        /* 专注标签按钮 */
+        .focus-tag-btn {
+            width: 100%; background: rgba(0,0,0,0.1); border: 1px solid var(--glass-border);
+            color: var(--text-main); font-size: 0.95em; padding: 10px; margin-bottom: 12px; 
+            border-radius: 6px; cursor: pointer; transition: all 0.2s; text-align: center;
         }
-
+        .focus-tag-btn:hover { border-color: var(--accent-color); color: var(--accent-color); }
+        
         .action-row { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         button.action-btn {
             background: rgba(255,255,255,0.06); border: 1px solid #555; color: var(--text-dim); padding: 14px 0;
@@ -172,12 +176,11 @@
         /* === 模态框通用 === */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
-            z-index: 100; display: none; opacity: 0; transition: opacity 0.3s;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(5px);
+            z-index: 1000; display: none; opacity: 0; transition: opacity 0.3s;
         }
         .modal-overlay.open { display: block; opacity: 1; }
 
-        /* 输入弹窗基础样式 */
         .input-modal {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 90%; max-width: 360px; background: var(--card-bg); border: 1px solid #444;
@@ -222,15 +225,14 @@
         .item-name { font-weight: bold; color: var(--text-main); font-size: 0.95em; }
         .item-desc { font-size: 0.75em; color: var(--text-dim); margin-top: 3px; }
         .buy-btn { background: #333; color: #ffdb4d; border: 1px solid #555; padding: 5px 12px; border-radius: 4px; font-size: 0.85em; cursor: pointer; white-space: nowrap; }
-        
-        /* 待办清单 */
+
+        /* 标签 & 待办列表 */
         .todo-list-container { list-style: none; padding: 0; margin: 0; max-height: 300px; overflow-y: auto; text-align: left; margin-bottom: 15px; }
         .todo-item { display: flex; align-items: center; padding: 8px 0; font-size: 0.95em; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .todo-item.completed span { text-decoration: line-through; color: var(--text-dim); }
         .todo-item input[type="checkbox"] { margin-right: 10px; accent-color: var(--accent-color); }
         .todo-del { margin-left: auto; background: transparent; border: none; color: #d9534f; cursor: pointer; font-size: 1.2em; }
-
-        /* 标签选择 */
+        
         .tags-container { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
         .tag-chip { background: rgba(255,255,255,0.1); border: 1px solid #555; color: var(--text-dim); padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 0.9em; position: relative; }
         .tag-chip:hover { background: rgba(255,255,255,0.2); color: var(--text-main); }
@@ -327,7 +329,7 @@
             </div>
         </div>
 
-        <!-- Chat (Expanded) -->
+        <!-- Chat -->
         <div class="chat-area" id="chat-box"></div>
 
         <!-- Controls -->
@@ -339,10 +341,10 @@
                 </div>
             </div>
 
-            <!-- 当前专注内容提示 -->
-            <div class="current-tag-display" id="current-tag-display">
-                <span style="color:var(--accent-color);">●</span> 专注内容: <span id="focus-tag-label">默认</span>
-            </div>
+            <!-- 专注标签选择 -->
+            <button class="focus-tag-btn" onclick="openTagModal()">
+                <span id="current-focus-tag">🏷️ 设定专注内容 (默认)</span>
+            </button>
 
             <div class="action-row">
                 <button class="action-btn primary" id="focus-btn" onclick="toggleFocus()">开始专注</button>
@@ -366,7 +368,7 @@
             <h3>选择专注内容</h3>
             <div id="tags-list" class="tags-container"></div>
             <div style="display:flex; gap:5px;">
-                <input type="text" class="input-field" id="new-tag-input" placeholder="新标签..." style="margin-bottom:0;" autocomplete="off">
+                <input type="text" class="input-field" id="new-tag-input" placeholder="新标签..." style="margin-bottom:0;">
                 <button class="buy-btn" onclick="addNewTag()">添加</button>
             </div>
             <div class="modal-actions">
@@ -502,7 +504,7 @@
             customInput: document.getElementById('custom-minutes'),
             timeSetterBox: document.getElementById('time-setter-box'),
             // Focus Tag UI
-            focusTagLabel: document.getElementById('focus-tag-label'),
+            focusTagLabel: document.getElementById('current-focus-tag'),
             modalTags: document.getElementById('modal-tags'),
             tagsList: document.getElementById('tags-list'),
             newTagInput: document.getElementById('new-tag-input'),
@@ -799,7 +801,7 @@
                 playerData.tags = playerData.tags.filter(t => t !== tag);
                 if(state.currentFocusTag === tag) {
                     state.currentFocusTag = "默认";
-                    ui.focusTagLabel.innerText = "默认";
+                    ui.focusTagLabel.innerText = "🏷️ 设定专注内容 (默认)";
                 }
                 saveData();
                 renderTags();
@@ -808,7 +810,7 @@
         
         function selectTag(tag) {
             state.currentFocusTag = tag;
-            ui.focusTagLabel.innerText = tag;
+            ui.focusTagLabel.innerText = `🏷️ ${tag}`;
             closeTagModal();
         }
 
