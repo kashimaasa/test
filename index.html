@@ -1286,18 +1286,26 @@
         cheerful: ["哼着不知名的爵士小调...", "微笑着向您致意...", "正在尝试新的调酒配方..."]
     };
 
-    // --- 状态数据 ---
-    let state = {
-        isFocusing: false, isPaused: false, timeLeft: 0, initialTime: 0, timerId: null, audioContext: null, mood: 'calm', completedCount: 0, elapsedFocusTime: 0,
-        currentDiaryId: null,
-        currentFocusTag: "默认",
-        calendarOffset: 0,
-        selectedDateObj: null,
-        historyCalOffset: 0, 
+    // --- 状态数据 --
+let state = {
+    isFocusing: false, 
+    isPaused: false, 
+    timeLeft: 0, 
+    initialTime: 0, 
+    timerId: null, 
+    audioContext: null, 
+    mood: 'calm', 
+    completedCount: 0, 
+    elapsedFocusTime: 0,
+    currentDiaryId: null,
+    currentFocusTag: "默认",
+    calendarOffset: 0,
+    selectedDateObj: null,
+    historyCalOffset: 0, 
     historySelectedDate: new Date(),
-        vibrationEnabled: true, 
-        reminderInterval: null 
-    };
+    vibrationEnabled: true, 
+    reminderInterval: null 
+};
 let workHistory = [];
     let playerData = {
         coins: 0,
@@ -1531,7 +1539,7 @@ let workHistory = [];
     }
 
     function triggerImport() { document.getElementById('file-input').click(); }
-
+    
     function handleFileImport(input) {
         const file = input.files[0]; if (!file) return;
         const reader = new FileReader();
@@ -1971,28 +1979,37 @@ let workHistory = [];
         });
     }
 
-    // 触发提醒
-    function triggerReminder(item) {
-        item.alerted = true; // 标记已提醒，防止重复震动
-        saveData();
-        
-        // 1. 震动 (如果开启)
-        if(state.vibrationEnabled && navigator.vibrate) {
-            navigator.vibrate([200, 100, 200]);
+function triggerReminder(item) {
+    item.alerted = true;
+    saveData();
+    
+    // 增强的震动逻辑
+    if(state.vibrationEnabled) {
+        // 检查浏览器支持
+        if (navigator.vibrate) {
+            // 震动模式：短-长-短
+            navigator.vibrate([200, 100, 400, 100, 200]);
+        } else {
+            console.log("震动API不支持");
         }
-        
-        // 2. 提示
-        showToast(`🔔 提醒：${item.text}`);
-        addMessage(`(轻敲桌子) “打扰一下，您安排的「${item.text}」时间到了。”`, "bartender");
     }
+    
+    showToast(`🔔 提醒：${item.text}`);
+    addMessage(`(轻敲桌子) "打扰一下，您安排的「${item.text}」时间到了。"`, "bartender");
+}
 
     // 震动开关切换
     function toggleVibration() {
-        state.vibrationEnabled = !state.vibrationEnabled;
-        const btn = document.getElementById('vib-toggle-btn');
-        btn.innerText = state.vibrationEnabled ? "📳 震动: 开" : "📳 震动: 关";
-        btn.style.opacity = state.vibrationEnabled ? "1" : "0.5";
-        showToast(state.vibrationEnabled ? "震动提醒已开启" : "震动提醒已关闭");
+    state.vibrationEnabled = !state.vibrationEnabled;
+    const btn = document.getElementById('vib-toggle-btn');
+    btn.innerText = state.vibrationEnabled ? "📳 震动: 开" : "📳 震动: 关";
+    btn.style.opacity = state.vibrationEnabled ? "1" : "0.5";
+    
+    // 调试信息
+    console.log("震动状态:", state.vibrationEnabled);
+    console.log("震动API支持:", !!navigator.vibrate);
+    
+    showToast(state.vibrationEnabled ? "震动提醒已开启" : "震动提醒已关闭");
     }
 
     function openTodoModal() { 
@@ -2993,6 +3010,7 @@ let workHistory = [];
 </script>
 </body>
 </html>
+
 
 
 
